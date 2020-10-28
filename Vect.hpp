@@ -12,17 +12,18 @@
 #include  <stdexcept>           // exceptions standard
 #include  <ostream>             // Flux d'output
 
-template <typename T, std::size_t DIM>
+template <typename T>
 class Vect_fix {
-  T _val[DIM]{};
+  std::size_t const DIM;
+  T* _val;
   T _NULL{};
-  void _to_null(T vec[]){ for(std::size_t i=0; i<=DIM; i++){}   }
+  void _to_null(T vec[]){ for(std::size_t i=0; i<=DIM; i++){}   };
 public:
   // constructeurs
-  constexpr Vect_fix () noexcept = default;   // Tableau vide
-  constexpr Vect_fix (const std::initializer_list<T>&) noexcept;
+  //constexpr Vect_fix(): DIM(10) {T tab[DIM]{}; _val= tab;};   // Tableau vide
+  constexpr Vect_fix (const std::size_t taille=10) noexcept;
   // observateurs
-  static constexpr std::size_t dim () noexcept {return DIM;}
+  const std::size_t dim () const noexcept {return DIM;};
   inline const T& operator[] (std::ptrdiff_t) const;
   // modificateurs
   inline T& operator[] (std::ptrdiff_t);
@@ -36,25 +37,21 @@ public:
 
 
   // fonctions externes
-  template <typename U, std::size_t D>
-  friend inline std::ostream& operator<< (std::ostream&, const Vect_fix<U,D>&);
+  template <typename U>
+  friend inline std::ostream& operator<< (std::ostream&, const Vect_fix<U>&);
 
 
 }; // Vect_fix<T>
 
 // constructeurs ============================================================
 
-template <typename T, std::size_t DIM>
-constexpr Vect_fix<T, DIM>::Vect_fix (const std::initializer_list<T>& init) noexcept {
-  const std::size_t d = init.size() < DIM ? init.size() : DIM;
-  auto p = init.begin();
-  for (std::size_t i = 0; i < d; ++i) _val[i] = *p++;
-}
+template <typename T>
+constexpr Vect_fix<T>::Vect_fix (std::size_t taille) noexcept : DIM(taille) {T tab[DIM]{}; _val= tab;}
 
 // observateurs =============================================================
 
-template <typename T, std::size_t DIM>
-const T& Vect_fix<T, DIM>::operator[] (std::ptrdiff_t idx) const {
+template <typename T>
+const T& Vect_fix<T>::operator[] (std::ptrdiff_t idx) const {
   if (std::size_t(idx) >= DIM)
     throw std::domain_error("Vect_fix::op[]: index out of range");
   return _val[idx];
@@ -62,8 +59,8 @@ const T& Vect_fix<T, DIM>::operator[] (std::ptrdiff_t idx) const {
 
 // modificateurs ============================================================
 
-template <typename T, std::size_t DIM>
-T& Vect_fix<T, DIM>::operator[] (std::ptrdiff_t idx) {
+template <typename T>
+T& Vect_fix<T>::operator[] (std::ptrdiff_t idx) {
   if (std::size_t(idx) >= DIM)
     throw std::domain_error("Vect_fix::op[]: index out of range");
   return _val[idx];
@@ -71,9 +68,10 @@ T& Vect_fix<T, DIM>::operator[] (std::ptrdiff_t idx) {
 
 // fonctions externes =======================================================
 
-template <typename T, std::size_t DIM>
-inline std::ostream& operator<< (std::ostream& out, const Vect_fix<T, DIM>& v){
-  out << "[ "; for (auto x: v._val) out << x << ' '; out << ']';
+template <typename T>
+inline std::ostream& operator<< (std::ostream& out, const Vect_fix<T>& v){
+    const std::size_t tmp = v.dim();
+  out << "[ "; for (std::size_t i=0; i< tmp;i++){ out << v._val[i] << ' ';}; out << ']';
   return out;
 }
 
