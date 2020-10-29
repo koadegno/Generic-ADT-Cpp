@@ -28,6 +28,9 @@ protected:
   static constexpr const Info* _ptr (const Ptr2Info& p) {return p._ptr;}
   static constexpr const Info*& _ptr (Ptr2Info& p) {return p._ptr;}
   // Implementation
+
+  virtual ~Cont_base()= 0;
+
   // ...
 public:
   // ...
@@ -71,15 +74,18 @@ public:
     {return _ptr ? *_ptr : _EMPTY;}
   // Getter
   constexpr bool isEmpty () const noexcept {return !_ptr;}
+
+
+
 }; // Ptr2Info
 
 // Main class ================================================================
 
 template <typename T>
-class Cont final: private Cont_base<T>, // ... {
+class Cont final: private Cont_base<T>, public BST<T>, public Vect_fix<T>  {
   using _Base = Cont_base<T>;
-  using _Vect = // ... ;
-  using _BST =  // ... ;
+  using _Vect = Vect_fix<T>;
+  using _BST =  BST<T>;
   using _Base::_index;
   using _Base::_ptr;
   // ...
@@ -91,16 +97,23 @@ public:
   using Info = typename _Base::Info;
   using Ptr2Info = typename _Base::Ptr2Info;
   // ...
+
+  // constructeur
+  explicit Cont (std::size_t taille ) :_Base(), _BST(), _Vect(taille){};
+
+  //explicit Cont (const T obj) :_Base(obj), _BST(obj), _Vect(obj,DIM){};
+
+  virtual ~Cont() override = default;
 }; // Cont<T>
 
 
 
 // Deduction guides ==========================================================
-
+/*
 template <typename T>
 Cont (const Vect<T>&) -> Cont<typename T::value_type>;
 
 template <typename T>
 Cont (const BST<T>&) -> Cont<typename T::value_type>;
-
+*/
 #endif // _CONT_H_
