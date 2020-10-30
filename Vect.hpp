@@ -16,17 +16,18 @@ template <typename T>
 class Vect_fix {
   std::size_t const DIM;
   T* _val;
-  T _NULL{};
-  void _to_null(T vec[]){ for(std::size_t i=0; i<=DIM; i++){}   };
+protected:
+    static constexpr const T& _NULL = T();
+    void _to_null(T vec[]){ for(std::size_t i=0; i<=DIM; i++){}   };
 public:
   // constructeurs
   //constexpr Vect_fix(): DIM(10) {T tab[DIM]{}; _val= tab;};   // Tableau vide
   constexpr Vect_fix (const std::size_t taille=10) noexcept;
   // observateurs
   const std::size_t dim () const noexcept {return DIM;};
-  inline const T& operator[] (std::ptrdiff_t) const;
+  virtual inline const T& operator[] (std::ptrdiff_t) const;
   // modificateurs
-  inline T& operator[] (std::ptrdiff_t);
+  virtual inline T& operator[] (std::ptrdiff_t);
 
   // copie && transfer
   Vect_fix (const Vect_fix &v): _val(v._val){};
@@ -35,6 +36,7 @@ public:
   virtual Vect_fix& operator= (const Vect_fix& v) = delete;
   virtual Vect_fix& operator= (const Vect_fix&& v) = delete;
 
+    virtual void add(std::size_t current_idx,T& value){_val[current_idx] = value;}
 
   // fonctions externes
   /*template <typename U>

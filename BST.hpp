@@ -33,7 +33,7 @@ public:
     {return &v == &_NOT_FOUND;}
   constexpr bool isEmpty () const noexcept {return !_root;}
   virtual const T& find (const T&) const noexcept;
-  bool exists (const T& v) const noexcept {return !isNotFound(find(v));}
+  virtual bool exists (const T& v) const noexcept {return !isNotFound(find(v));}
   // Traversal
   template <typename Fct, typename... Args>
   inline void traverse (Fct, Args...) const;

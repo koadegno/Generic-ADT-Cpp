@@ -5,8 +5,8 @@
 
 
 int main(){
-    Cont<int> test1(2);
-    //#ifndef _BST_DBG_
+    Cont<int> test1(10);
+
     #define _BST_DBG_
     BST<int> test;
     test.insert(10);
@@ -14,15 +14,16 @@ int main(){
     test.insert(3);
     test.insert(40);
 
-    test1.insert(20);//
-    std::cout << test1 <<std::endl;
-    std::cout << "la taille : " << test1.current_space() << std::endl;
-    test1.insert(10);test1.insert(30);test1.insert(20);
-    std::cout << test1 <<std::endl;
+    auto val = test1.insert(20);
+
+    std::cout << test1<<val <<std::endl;
     std::cout << "la taille : " << test1.current_space() << std::endl;
 
+    test1.insert(10);test1.insert(30);
 
-    //#endif // _BST_DBG_
+    if (test1.exists(20)){
+        std::cout<<"rends pas fou";
+    };
 
-
+    return 0
 }
