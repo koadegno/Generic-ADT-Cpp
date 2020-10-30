@@ -18,8 +18,10 @@
 template <typename T>
 class Cont_base { // abstract
 public:
+
   class Info;
   class Ptr2Info;
+  virtual ~Cont_base()=0;
 protected:
   static constexpr const Info _EMPTY{};
   // Access methods
@@ -29,19 +31,22 @@ protected:
   static constexpr const Info*& _ptr (Ptr2Info& p) {return p._ptr;}
   // Implementation
 
-  virtual ~Cont_base()= 0;
+
 
   // ...
 public:
   // ...
 }; // Cont_base<T>
 
+template <typename T>
+Cont_base<T>::~Cont_base() {}
+
 // Embedded class Info =====================================================
 
 template <typename T>
 class Cont_base<T>::Info {
   friend class Cont_base<T>;   // for _index static methods
-  std::ptrdiff_t _index = -1;
+  std::ptrdiff_t _index = -1;  // valeur sentinelle
   const T _data{};
 public:
   // Traits
@@ -82,12 +87,15 @@ public:
 // Main class ================================================================
 
 template <typename T>
-class Cont final: private Cont_base<T>, public BST<T>, public Vect_fix<T>  {
+class Cont final: private Cont_base<T>, public BST< typename Cont_base<T>::Info >, public Vect_fix< typename Cont_base<T>::Ptr2Info >  {
   using _Base = Cont_base<T>;
-  using _Vect = Vect_fix<T>;
-  using _BST =  BST<T>;
+  using _Vect = Vect_fix<typename _Base::Ptr2Info >;
+  using _BST =  BST<typename _Base::Info>;
   using _Base::_index;
   using _Base::_ptr;
+
+  const std::size_t DIM;
+  std::ptrdiff_t current_vect_idx{};
   // ...
 public:
   // Traits
@@ -99,11 +107,30 @@ public:
   // ...
 
   // constructeur
-  explicit Cont (std::size_t taille ) :_Base(), _BST(), _Vect(taille){};
+  explicit Cont (std::size_t taille ):DIM(taille), _Base(), _Vect(taille){};
 
-  //explicit Cont (const T obj) :_Base(obj), _BST(obj), _Vect(obj,DIM){};
+  // methode
+  const T& insert (const T& v) {
 
-  virtual ~Cont() override = default;
+      bool cond_to_ins = _BST::exists(Info(v));
+      if (!cond_to_ins){
+          auto tmp = _BST::insert(Info(current_vect_idx,v));
+          current_vect_idx++;
+          return tmp;
+      }
+      else{
+
+        //throw std::domain_error("Already in ... ");
+        std::cout<< "\nDeja dedans : "<< v <<std::endl;
+      };
+
+      };
+
+  const std::size_t current_space() {return current_vect_idx;}
+
+
+
+  virtual ~Cont() override {};
 }; // Cont<T>
 
 

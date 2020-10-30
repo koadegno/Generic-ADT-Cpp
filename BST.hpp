@@ -13,7 +13,7 @@
 template <typename T>
 class BST {
 protected:
-  static constexpr const T _NOT_FOUND{};          // "not found" element
+  static constexpr const T& _NOT_FOUND = T ();          // "not found" element
   // Implementation
   class _Node;
   _Node *_root = nullptr;
@@ -53,6 +53,10 @@ public:
   template <typename U>
   friend inline std::ostream& operator<< (std::ostream&, const BST<U>&);
 }; // BST<T>
+
+
+//template <typename T>
+//const T BST<T>::_NOT_FOUND = T ();
 
 // Embedded class _Node ======================================================
 

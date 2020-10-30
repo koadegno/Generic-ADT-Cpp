@@ -37,8 +37,8 @@ public:
 
 
   // fonctions externes
-  template <typename U>
-  friend inline std::ostream& operator<< (std::ostream&, const Vect_fix<U>&);
+  /*template <typename U>
+  friend inline std::ostream& operator<< (std::ostream&, const Vect_fix<U>&);*/
 
 
 }; // Vect_fix<T>
@@ -68,6 +68,7 @@ T& Vect_fix<T>::operator[] (std::ptrdiff_t idx) {
 
 // fonctions externes =======================================================
 
+/*
 template <typename T>
 inline std::ostream& operator<< (std::ostream& out, const Vect_fix<T>& v){
     const std::size_t tmp = v.dim();
@@ -75,6 +76,6 @@ inline std::ostream& operator<< (std::ostream& out, const Vect_fix<T>& v){
   return out;
 }
 
-
+*/
 
 #endif // _VECT_FIX_H_
