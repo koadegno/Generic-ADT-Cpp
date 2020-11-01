@@ -113,51 +113,53 @@ public:
   // methode
   const T& insert (const T& v)  {
 
-      Info* info_wrapper = new Info(current_vect_idx,v);
-      Ptr2Info ptr_wrapper{};
+    Info* info_wrapper = new Info(current_vect_idx,v);
+    Ptr2Info ptr_wrapper{};
 
-      bool cond_to_ins = _BST::exists(*info_wrapper);
+    bool cond_to_ins = _BST::exists(*info_wrapper);
 
-      if (!cond_to_ins && (std::size_t)current_vect_idx < DIM){
-
-            _Base::_ptr(ptr_wrapper) = info_wrapper; // get the pointer to Info inside ptr_wrapper
-            //std::cout << "indice : " << current_vect_idx << std::endl;
-
-            _Vect::operator[](current_vect_idx) = ptr_wrapper ; // add inside the vecteur
-
-            auto val = _BST::insert(*info_wrapper);
-            return val;
+    if (!cond_to_ins && (std::size_t)current_vect_idx < DIM){
+      if (!(_Vect::operator[](current_vect_idx)== T{})){
+        _BST::erase(_Vect::operator[](current_vect_idx));
       }
-      else{
-            // TODO can i throw an error ?
-            //throw std::domain_error("Already in ... ");
-            std::cout<< "Insert n1\nDeja dedans ou Plus assez de place !!\nValue : "<< v <<std::endl;
-            return _BST::_NOT_FOUND;
-      };
+      _Base::_ptr(ptr_wrapper) = info_wrapper; // get the pointer to Info inside ptr_wrapper
+        //std::cout << "indice : " << current_vect_idx << std::endl;
+
+        _Vect::operator[](current_vect_idx) = ptr_wrapper ; // add inside the vecteur
+        current_vect_idx++;
+        auto val = _BST::insert(*info_wrapper);
+      return val;
+    }
+    else{
+      // TODO can i throw an error ?
+      //throw std::domain_error("Already in ... ");
+      std::cout<< "Insert n1\nDeja dedans ou Plus assez de place !!\nValue : "<< v <<std::endl;
+      return _BST::_NOT_FOUND;
+    };
 
   };
 
   const T& insert (const T& v, std::ptrdiff_t idx){
 
-  Info* info_wrapper = new Info(idx,v);
-      Ptr2Info ptr_wrapper{};
+    Info* info_wrapper = new Info(idx,v);
+    Ptr2Info ptr_wrapper{};
 
-      bool cond_to_ins = _BST::exists(*info_wrapper);
+    bool cond_to_ins = _BST::exists(*info_wrapper);
 
-      if (!cond_to_ins && (std::size_t)idx < DIM){
-            _Base::_ptr(ptr_wrapper) = info_wrapper; // get the reference to pointer to Info inside ptr_wrapper
+    if (!cond_to_ins && (std::size_t)idx < DIM){
+      _Base::_ptr(ptr_wrapper) = info_wrapper; // get the reference to pointer to Info inside ptr_wrapper
 
-            _Vect::operator[](idx) = ptr_wrapper ; // add inside the vecteur
-            auto val = _BST::insert(*info_wrapper);
+      _Vect::operator[](idx) = ptr_wrapper ; // add inside the vecteur
+      auto val = _BST::insert(*info_wrapper);
 
-            return val;
-      }
-      else{
-            // TODO can i throw an error ?
-            //throw std::domain_error("Already in ... ");
-            std::cout<< "Insert n2\nDeja dedans ou Plus assez de place !!\nValue : "<< v <<std::endl;
-            return _BST::_NOT_FOUND;
-      };
+      return val;
+    }
+    else{
+          // TODO can i throw an error ?
+          //throw std::domain_error("Already in ... ");
+      std::cout<< "Insert n2\nDeja dedans ou Plus assez de place !!\nValue : "<< v <<std::endl;
+      return _BST::_NOT_FOUND;
+    };
   }
 
 
