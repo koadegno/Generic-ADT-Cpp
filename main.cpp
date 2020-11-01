@@ -1,29 +1,24 @@
 #include <iostream>
 #include "Cont.hpp"
-#include  "Vect.hpp"
+#include  "Vect2.hpp"
 #include  "BST.hpp"
 
 
 int main(){
-    Cont<int> test1(10);
 
-    #define _BST_DBG_
-    BST<int> test;
-    test.insert(10);
-    test.insert(30);
-    test.insert(3);
-    test.insert(40);
+    Cont<int> var(10);
+    Vect_dyn<int> test(10);
+    test.insert(0,2);
+    std::cout << test[0] <<std::endl;
 
-    auto val = test1.insert(20);
 
-    std::cout << test1<<val <<std::endl;
-    std::cout << "la taille : " << test1.current_space() << std::endl;
+    var.insert(10,1);
+    var.insert(11);
+    var.insert(13);
+    //var.erase(10);
 
-    test1.insert(10);test1.insert(30);
 
-    if (test1.exists(20)){
-        std::cout<<"rends pas fou";
-    };
-
-    return 0
+    std::cout << var <<std::endl;
+    std::cout << var[2] <<std::endl;
+    return 0;
 }

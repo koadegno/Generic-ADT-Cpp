@@ -1,7 +1,7 @@
 /* GNU C++ version 10.2 - "g++ -std=c++17"
- * Yves Roggeman - 2020/09 - <Vect_fix.hpp>
+ * Adegnon Kokou Vinove - 2020/10 - <Vect_fix.hpp>
  * ADT de vecteur statique, mais paramétrique (template)
- * Taille fixée dans le type; transferts impossibles
+ * Taille fixée à la construction; transferts impossibles
  */
 #ifndef _VECT_FIX_H_
 #define _VECT_FIX_H_
@@ -15,9 +15,9 @@
 template <typename T>
 class Vect_fix {
   std::size_t const DIM;
-  T* _val;
+  T* _val{};
 protected:
-    static constexpr const T& _NULL = T();
+    static constexpr const T _NULL{};
     void _to_null(T vec[]){ for(std::size_t i=0; i<=DIM; i++){}   };
 public:
   // constructeurs
@@ -27,7 +27,7 @@ public:
   const std::size_t dim () const noexcept {return DIM;};
   virtual inline const T& operator[] (std::ptrdiff_t) const;
   // modificateurs
-  virtual inline T& operator[] (std::ptrdiff_t);
+  inline T& operator[] (std::ptrdiff_t);
 
   // copie && transfer
   Vect_fix (const Vect_fix &v): _val(v._val){};
@@ -36,7 +36,7 @@ public:
   virtual Vect_fix& operator= (const Vect_fix& v) = delete;
   virtual Vect_fix& operator= (const Vect_fix&& v) = delete;
 
-    virtual void add(std::size_t current_idx,T& value){_val[current_idx] = value;}
+  virtual void add(std::size_t current_idx,T& value){_val[current_idx] = value;}
 
   // fonctions externes
   /*template <typename U>
@@ -48,7 +48,12 @@ public:
 // constructeurs ============================================================
 
 template <typename T>
-constexpr Vect_fix<T>::Vect_fix (std::size_t taille) noexcept : DIM(taille) {T tab[DIM]{}; _val= tab;}
+constexpr Vect_fix<T>::Vect_fix (std::size_t taille) noexcept : DIM(taille) {
+  T tab[DIM]={_NULL};_val= tab;
+  /*for (std::size_t i =0; i< DIM; i++){
+        std::cout<<_val[i]<<" ";
+    };*/
+   }
 
 // observateurs =============================================================
 
