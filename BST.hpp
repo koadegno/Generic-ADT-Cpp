@@ -146,13 +146,13 @@ typename BST<T>::_Node* BST<T>::_erase (_Node*& target) noexcept {
 
 template <typename T>
 BST<T>& BST<T>::operator= (const BST& t) {
-  if (this != &t) {delete _root; _root = _cp(t._root);}
+  if (this != &t) {nb_node=t.nb_node;delete _root; _root = _cp(t._root);}
   return *this;
 }
 
 template <typename T>
 BST<T>& BST<T>::operator= (BST&& t) {
-  if (this != &t) {delete _root; _root = t._root; t._root = nullptr;}
+  if (this != &t) {nb_node=t.nb_node; t.nb_node=0 ;delete _root; _root = t._root; t._root = nullptr;}
   return *this;
 }
 

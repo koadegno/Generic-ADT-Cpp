@@ -94,14 +94,14 @@ public:
 // Main class ================================================================
 
 template <typename T>
-class Cont final: private Cont_base<T>, public BST< typename Cont_base<T>::Info >, public Vect_dyn< typename Cont_base<T>::Ptr2Info >  {
+class Cont final: private Cont_base<T>, public BST< typename Cont_base<T>::Info >, public Vect< typename Cont_base<T>::Ptr2Info >  {
   using _Base = Cont_base<T>;
-  using _Vect = Vect_dyn<typename _Base::Ptr2Info >;
+  using _Vect = Vect<typename _Base::Ptr2Info >;
   using _BST =  BST<typename _Base::Info>;
   using _Base::_index;
   using _Base::_ptr;
 
-  const std::size_t DIM;
+  std::size_t DIM;
   std::ptrdiff_t current_vect_idx{};
 
   // ...
@@ -115,7 +115,51 @@ public:
   // ...
 
   // constructeur
+  Cont() = delete;
   explicit Cont (std::size_t taille ): _Base(), _Vect(taille),DIM(taille){};
+
+  Cont(const Cont& other)noexcept:_Base(other),_BST(other),_Vect(other),DIM(other.DIM),current_vect_idx(other.current_vect_idx){};
+
+  constexpr Cont(Cont&& other)noexcept:_Base(other),_BST(other),_Vect(other),DIM(other.DIM),current_vect_idx(other.current_vect_idx){
+    other = Cont<T>(); other.DIM = 0; other.current_vect_idx = 0;
+  }
+
+  Cont& operator= (const Cont& other){
+    if(this!= &other){
+      _Vect::operator=(other);
+      _BST::operator=(other);
+      DIM = other.DIM;
+      current_vect_idx = other.current_vect_idx;
+    }
+    return *this;
+  }
+
+  Cont& operator= ( Cont&& other){
+    if(this!= &other){
+      _Vect::operator=(other);
+      _BST::operator=(other);
+      DIM = other.DIM; other.DIM = 0;
+      current_vect_idx = other.current_vect_idx; other.current_vect_idx =0;
+
+    }
+    return *this;
+  }
+
+  // Getter
+  const T& operator[](std::ptrdiff_t idx) const {
+    auto val= _Vect::operator[](idx);
+    return val;
+  };
+
+
+  inline const std::size_t current_space() {
+    return current_vect_idx;}
+
+  int const node_number () const {
+    return _BST::node_number();}
+
+  std::size_t const dim() const {
+    return DIM;}
 
   // methode
   const T& insert (const T& v) override {
@@ -158,7 +202,7 @@ public:
     if (!cond_to_ins && (std::size_t)idx < DIM){
 
       if ( _Base::_ptr(_Vect::operator[](idx)) != nullptr ){ // at idx there is != nullptr
-        _BST::erase(_Vect::operator[](current_vect_idx));
+        _BST::erase(_Vect::operator[](idx));
         printf("I get here idx : %d \n",(int)idx);
       }
 
@@ -212,12 +256,6 @@ public:
   }
 
 
-  const T& operator[](std::ptrdiff_t idx) const {
-    auto val= _Vect::operator[](idx);
-    return val;
-  };
-
-
   bool exists  (const T& v) const override{
         auto val = _BST::exists(Info(v));
         return val;
@@ -241,22 +279,16 @@ public:
   };
 
 
-  inline const std::size_t current_space() {return current_vect_idx;}
-
-  int const node_number () const {return _BST::node_number();}
-
-  std::size_t const dim() const {return DIM;}
-
   virtual ~Cont() override {};
 }; // Cont<T>
 
 
 // Deduction guides ==========================================================
-/*
+
 template <typename T>
 Cont (const Vect<T>&) -> Cont<typename T::value_type>;
 
 template <typename T>
 Cont (const BST<T>&) -> Cont<typename T::value_type>;
-*/
+
 #endif // _CONT_H_
