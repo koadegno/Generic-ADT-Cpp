@@ -5,7 +5,7 @@
 #ifndef _CONT_H_
 #define _CONT_H_
 
-#include  "Vect2.hpp"
+#include  "Vect.hpp"
 #include  "BST.hpp"
 #include  <cstddef>             // nullptr_t, size_t, ptrdiff_t, byte...
 #include  <utility>             // swap, move, forward...
@@ -31,7 +31,14 @@ protected:
   static constexpr const Info*& _ptr (Ptr2Info& p) {return p._ptr;}
   // Implementation
 
-
+  virtual const T& insert (const T& v) = 0;
+  virtual const T& insert (const T& v, std::ptrdiff_t idx) = 0;
+  virtual const bool erase(const T& v) = 0;
+  virtual const bool erase(const T& v, std::ptrdiff_t idx) = 0;
+  virtual const T& operator[] (std::ptrdiff_t idx) const = 0;
+  virtual bool exists (const T& v) const = 0;
+  virtual const T& find (const T&) const = 0;
+  virtual const T& find (const T&, std::ptrdiff_t idx) const = 0;
 
   // ...
 public:
@@ -111,7 +118,7 @@ public:
   explicit Cont (std::size_t taille ): _Base(), _Vect(taille),DIM(taille){};
 
   // methode
-  const T& insert (const T& v)  {
+  const T& insert (const T& v) override {
 
     Info* info_wrapper = new Info(current_vect_idx,v);
     Ptr2Info ptr_wrapper{};
@@ -119,7 +126,7 @@ public:
     bool cond_to_ins = _BST::exists(*info_wrapper);
 
     if (!cond_to_ins && (std::size_t)current_vect_idx < DIM){
-      if (!(_Vect::operator[](current_vect_idx)== T{})){
+      if ( _Base::_ptr(_Vect::operator[](current_vect_idx)) != nullptr ){
         _BST::erase(_Vect::operator[](current_vect_idx));
       }
       _Base::_ptr(ptr_wrapper) = info_wrapper; // get the pointer to Info inside ptr_wrapper
@@ -139,63 +146,106 @@ public:
 
   };
 
-  const T& insert (const T& v, std::ptrdiff_t idx){
+
+  const T& insert (const T& v, std::ptrdiff_t idx) override {
 
     Info* info_wrapper = new Info(idx,v);
     Ptr2Info ptr_wrapper{};
 
     bool cond_to_ins = _BST::exists(*info_wrapper);
+    //printf("nb d'element : %d \n",_BST::node_number());
 
     if (!cond_to_ins && (std::size_t)idx < DIM){
-      _Base::_ptr(ptr_wrapper) = info_wrapper; // get the reference to pointer to Info inside ptr_wrapper
 
+      if ( _Base::_ptr(_Vect::operator[](idx)) != nullptr ){ // at idx there is != nullptr
+        _BST::erase(_Vect::operator[](current_vect_idx));
+        printf("I get here idx : %d \n",(int)idx);
+      }
+
+      _Base::_ptr(ptr_wrapper) = info_wrapper; // get the reference to pointer to Info inside ptr_wrapper
       _Vect::operator[](idx) = ptr_wrapper ; // add inside the vecteur
       auto val = _BST::insert(*info_wrapper);
 
       return val;
     }
-    else{
-          // TODO can i throw an error ?
-          //throw std::domain_error("Already in ... ");
-      std::cout<< "Insert n2\nDeja dedans ou Plus assez de place !!\nValue : "<< v <<std::endl;
-      return _BST::_NOT_FOUND;
-    };
-  }
 
-
-  const bool erase(const T& v) {
-
-        Info info_wrapper = Info(v);bool cond_to_del = _BST::exists(info_wrapper);
-
-        if ( cond_to_del ){
-            auto the_info = _BST::find(info_wrapper);
-            auto the_ptr2info = _Base::_index(the_info);
-            _BST::erase(the_info); _Vect::operator[](the_ptr2info) = Ptr2Info{};
-            return true;
-        }
-        else{
-            std::cout << "\nExiste pas tu joues a quoi ?  Value : "<< info_wrapper <<std::endl;
-            return false;
-        };
-
+        // TODO can i throw an error ?
+        //throw std::domain_error("Already in ... ");
+    std::cout<< "Insert n2\nDeja dedans ou Plus assez de place !!\nValue : "<< v <<std::endl;
+    return _BST::_NOT_FOUND;
 
   }
 
 
-  const T& operator[] (std::ptrdiff_t idx){
+  const bool erase(const T& v) override {
+
+    Info info_wrapper = Info(v);bool cond_to_del = _BST::exists(info_wrapper);
+
+    if ( cond_to_del ){
+      auto the_info = _BST::find(info_wrapper);
+      auto the_index_2info = _Base::_index(the_info); // get the index in Vect
+      _BST::erase(the_info); _Vect::operator[](the_index_2info) = Ptr2Info{};
+      return true;
+    }
+    // TODO modifier le cout
+    std::cout << "\nExiste pas tu joues a quoi ?  Value : "<< info_wrapper <<std::endl;
+    return false;
+
+
+
+  }
+
+
+  const bool erase(const T& v,std::ptrdiff_t idx) override {
+    Info info_wrapper = Info(v);bool cond_to_del = _BST::exists(info_wrapper);
+
+    if ( cond_to_del && _Vect::operator[](idx) == info_wrapper ){ // existe in BTS and Vect
+      auto the_info = _BST::find(info_wrapper);
+      _BST::erase(the_info); _Vect::operator[](idx) = Ptr2Info{}; // erase from everywhere
+      return true;
+    }
+
+    // TODO modifier le cout
+    std::cout << "\nExiste pas, Value and index : "<< info_wrapper << idx<< std::endl;
+    return false;
+
+  }
+
+
+  const T& operator[](std::ptrdiff_t idx) const {
     auto val= _Vect::operator[](idx);
     return val;
+  };
+
+
+  bool exists  (const T& v) const override{
+        auto val = _BST::exists(Info(v));
+        return val;
+  };
+
+
+  const T& find (const T& v) const noexcept override{
+    return _BST::find(Info(v));
   }
 
-  virtual bool exists (const T& v) const {
-        return _BST::exists( Info(v) );
+
+  const T& find (const T& v,std::ptrdiff_t idx) const noexcept override{
+
+    Info val_info = Info(v);
+    if (idx == _Base::_index(_BST::find(val_info)) ){ // get the info in the BTS and then get idx of that info
+      return _BST::find(Info(v));
+    }
+
+    return _BST::_NOT_FOUND; // idx doesn't match
+
+  };
 
 
-  }
+  inline const std::size_t current_space() {return current_vect_idx;}
 
-  const std::size_t current_space() {return current_vect_idx;}
+  int const node_number () const {return _BST::node_number();}
 
-
+  std::size_t const dim() const {return DIM;}
 
   virtual ~Cont() override {};
 }; // Cont<T>

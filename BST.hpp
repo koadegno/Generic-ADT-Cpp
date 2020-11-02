@@ -14,6 +14,7 @@ template <typename T>
 class BST {
 protected:
   static constexpr const T& _NOT_FOUND = T ();          // "not found" element
+  int nb_node{};
   // Implementation
   class _Node;
   _Node *_root = nullptr;
@@ -39,9 +40,9 @@ public:
   inline void traverse (Fct, Args...) const;
   // Setters
   virtual const T& insert (const T& v)            // always add
-    {return (_nextLeaf(v) = new _Node(v))->info;}
+    {nb_node++; return (_nextLeaf(v) = new _Node(v))->info;}
   virtual bool erase (const T& v)                 // false if doesn't exist
-    {_Node *res = _erase(_findNode(v)); delete res; return res;}
+    {_Node *res = _erase(_findNode(v));nb_node--; delete res; return res;}
   // Copies & transfers
   BST (const BST& t) noexcept: _root(_cp(t._root)) {}
   constexpr BST (BST&& t) noexcept: _root(t._root) {t._root = nullptr;}
@@ -52,6 +53,10 @@ public:
   // Associated function
   template <typename U>
   friend inline std::ostream& operator<< (std::ostream&, const BST<U>&);
+
+  // Implemantation
+
+  inline int const node_number() const {return nb_node;}
 }; // BST<T>
 
 
