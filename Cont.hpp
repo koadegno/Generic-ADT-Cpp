@@ -1,6 +1,6 @@
 /* GNU C++ version 10.2 - "g++ -std=c++17"
- * NOM, Prénom - 2020/12 - <Cont.hpp>
- * Exemple de conteneur (projet n°1)
+ * NOM, Prï¿½nom - 2020/12 - <Cont.hpp>
+ * Exemple de conteneur (projet nï¿½1)
  */
 #ifndef _CONT_H_
 #define _CONT_H_
@@ -21,7 +21,7 @@ public:
 
   class Info;
   class Ptr2Info;
-  virtual ~Cont_base()=0;
+  
 protected:
   static constexpr const Info _EMPTY{};
   // Access methods
@@ -30,15 +30,7 @@ protected:
   static constexpr const Info* _ptr (const Ptr2Info& p) {return p._ptr;}
   static constexpr const Info*& _ptr (Ptr2Info& p) {return p._ptr;}
   // Implementation
-
-  virtual const T& insert (const T& v) = 0;
-  virtual const T& insert (const T& v, std::ptrdiff_t idx) = 0;
-  virtual const bool erase(const T& v) = 0;
-  virtual const bool erase(const T& v, std::ptrdiff_t idx) = 0;
-  virtual const T& operator[] (std::ptrdiff_t idx) const = 0;
-  virtual bool exists (const T& v) const = 0;
-  virtual const T& find (const T&) const = 0;
-  virtual const T& find (const T&, std::ptrdiff_t idx) const = 0;
+  virtual ~Cont_base()=0;
 
   // ...
 public:
@@ -148,6 +140,7 @@ public:
   // Getter
   const T& operator[](std::ptrdiff_t idx) const {
     auto val= _Vect::operator[](idx);
+    //std::cout << val << std::endl;
     return val;
   };
 
@@ -162,7 +155,7 @@ public:
     return DIM;}
 
   // methode
-  const T& insert (const T& v) override {
+  const T& insert (const T& v)  {
 
     Info* info_wrapper = new Info(current_vect_idx,v);
     Ptr2Info ptr_wrapper{};
@@ -174,11 +167,12 @@ public:
         _BST::erase(_Vect::operator[](current_vect_idx));
       }
       _Base::_ptr(ptr_wrapper) = info_wrapper; // get the pointer to Info inside ptr_wrapper
-        //std::cout << "indice : " << current_vect_idx << std::endl;
+      //std::cout << "indice : " << current_vect_idx << std::endl;
 
-        _Vect::operator[](current_vect_idx) = ptr_wrapper ; // add inside the vecteur
-        current_vect_idx++;
-        auto val = _BST::insert(*info_wrapper);
+      _Vect::operator[](current_vect_idx) = ptr_wrapper ; // add inside the vecteur
+      current_vect_idx++;
+      auto val = _BST::insert(*info_wrapper);
+      delete info_wrapper;
       return val;
     }
     else{
@@ -191,7 +185,7 @@ public:
   };
 
 
-  const T& insert (const T& v, std::ptrdiff_t idx) override {
+  const T& insert (const T& v, std::ptrdiff_t idx)  {
 
     Info* info_wrapper = new Info(idx,v);
     Ptr2Info ptr_wrapper{};
@@ -203,13 +197,15 @@ public:
 
       if ( _Base::_ptr(_Vect::operator[](idx)) != nullptr ){ // at idx there is != nullptr
         _BST::erase(_Vect::operator[](idx));
-        printf("I get here idx : %d \n",(int)idx);
+        std::cout<< "pb regs ici stp";
       }
 
       _Base::_ptr(ptr_wrapper) = info_wrapper; // get the reference to pointer to Info inside ptr_wrapper
       _Vect::operator[](idx) = ptr_wrapper ; // add inside the vecteur
+      //std::cout << "Value : " << _Vect::operator[](idx) << " Index : " << idx << std::endl;
       auto val = _BST::insert(*info_wrapper);
 
+      //delete info_wrapper;
       return val;
     }
 
@@ -221,7 +217,7 @@ public:
   }
 
 
-  const bool erase(const T& v) override {
+  const bool erase(const T& v)  {
 
     Info info_wrapper = Info(v);bool cond_to_del = _BST::exists(info_wrapper);
 
@@ -239,13 +235,12 @@ public:
 
   }
 
-
-  const bool erase(const T& v,std::ptrdiff_t idx) override {
+  const bool erase(const T& v,std::ptrdiff_t idx)  {
     Info info_wrapper = Info(v);bool cond_to_del = _BST::exists(info_wrapper);
 
     if ( cond_to_del && _Vect::operator[](idx) == info_wrapper ){ // existe in BTS and Vect
       auto the_info = _BST::find(info_wrapper);
-      _BST::erase(the_info); _Vect::operator[](idx) = Ptr2Info{}; // erase from everywhere
+      _BST::erase(the_info); _Vect::operator[](idx) = Ptr2Info{}; // erase from everywhere (BST and Vect)
       return true;
     }
 
@@ -256,18 +251,18 @@ public:
   }
 
 
-  bool exists  (const T& v) const override{
+  bool exists  (const T& v) const {
         auto val = _BST::exists(Info(v));
         return val;
   };
 
 
-  const T& find (const T& v) const noexcept override{
+  const T& find (const T& v) const noexcept {
     return _BST::find(Info(v));
   }
 
 
-  const T& find (const T& v,std::ptrdiff_t idx) const noexcept override{
+  const T& find (const T& v,std::ptrdiff_t idx) const noexcept {
 
     Info val_info = Info(v);
     if (idx == _Base::_index(_BST::find(val_info)) ){ // get the info in the BTS and then get idx of that info
