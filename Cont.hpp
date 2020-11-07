@@ -21,9 +21,9 @@ public:
 
   class Info;
   class Ptr2Info;
-  
+
 protected:
-  static constexpr const Info _EMPTY{};
+  static constexpr const Info& _EMPTY{};
   // Access methods
   static constexpr std::ptrdiff_t _index (const Info& i) {return i._index;}
   static constexpr std::ptrdiff_t& _index (Info& i) {return i._index;}
@@ -107,7 +107,7 @@ public:
   // ...
 
   // constructeur
-  Cont() = delete;
+
   explicit Cont (std::size_t taille ): _Base(), _Vect(taille),DIM(taille){};
 
   Cont(const Cont& other)noexcept:_Base(other),_BST(other),_Vect(other),DIM(other.DIM),current_vect_idx(other.current_vect_idx){};
@@ -171,9 +171,9 @@ public:
 
       _Vect::operator[](current_vect_idx) = ptr_wrapper ; // add inside the vecteur
       current_vect_idx++;
-      auto val = _BST::insert(*info_wrapper);
-      delete info_wrapper;
-      return val;
+      _BST::insert(*info_wrapper);
+
+      return *info_wrapper;
     }
     else{
       // TODO can i throw an error ?
@@ -276,6 +276,7 @@ public:
 
   virtual ~Cont() override {};
 }; // Cont<T>
+
 
 
 // Deduction guides ==========================================================

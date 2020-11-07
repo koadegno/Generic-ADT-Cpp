@@ -10,10 +10,11 @@
 #include  <cstddef>             // nullptr_t, size_t, ptrdiff_t, byte...
 #include  <ostream>             // output streams
 
+
 template <typename T>
 class BST {
 protected:
-  static constexpr const T& _NOT_FOUND = T ();          // "not found" element
+  static constexpr const T& _NOT_FOUND{};          // "not found" element
   int nb_node{};
   // Implementation
   class _Node;
@@ -161,5 +162,7 @@ BST<T>& BST<T>::operator= (BST&& t) {
 template <typename T>
 inline std::ostream& operator<< (std::ostream& out, const BST<T>& t)
   {out << "[ "; t._dsp(out); out << ']'; return out;}
+
+
 
 #endif // _BST_H_
