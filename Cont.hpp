@@ -89,7 +89,7 @@ template <typename T>
 class Cont final: private Cont_base<T>, public BST< typename Cont_base<T>::Info >, public Vect< typename Cont_base<T>::Ptr2Info >  {
   using _Base = Cont_base<T>;
   using _Vect = Vect<typename _Base::Ptr2Info >;
-  using _BST =  BST<typename _Base::Info>;
+  using _BST  = BST<typename _Base::Info>;
   using _Base::_index;
   using _Base::_ptr;
 
@@ -110,10 +110,13 @@ public:
 
   explicit Cont (std::size_t taille ): _Base(), _Vect(taille),DIM(taille){};
 
+  Cont (const Vect<T>& obj):_Vect(obj) {std::cout << "je suis call "<< std::endl;}
+
   Cont(const Cont& other)noexcept:_Base(other),_BST(other),_Vect(other),DIM(other.DIM),current_vect_idx(other.current_vect_idx){};
 
-  constexpr Cont(Cont&& other)noexcept:_Base(other),_BST(other),_Vect(other),DIM(other.DIM),current_vect_idx(other.current_vect_idx){
-    other = Cont<T>(); other.DIM = 0; other.current_vect_idx = 0;
+  constexpr Cont(Cont&& other)noexcept:_Base(std::move(other)),_BST(std::move(other)),_Vect(std::move(other)),DIM(other.DIM),current_vect_idx(other.current_vect_idx){
+    //other = Cont<T>(0);
+    other.DIM = 0; other.current_vect_idx = 0;
   }
 
   Cont& operator= (const Cont& other){
@@ -154,26 +157,27 @@ public:
   std::size_t const dim() const {
     return DIM;}
 
-  // methode
-  const T& insert (const T& v)  {
 
-    Info* info_wrapper = new Info(current_vect_idx,v);
+  // methode
+  const Info& insert (const Info& v) override {
+
+    /*Info* info_wrapper = new Info(current_vect_idx,v);*/
     Ptr2Info ptr_wrapper{};
 
-    bool cond_to_ins = _BST::exists(*info_wrapper);
+    bool cond_to_ins = _BST::exists(v);
 
     if (!cond_to_ins && (std::size_t)current_vect_idx < DIM){
       if ( _Base::_ptr(_Vect::operator[](current_vect_idx)) != nullptr ){
         _BST::erase(_Vect::operator[](current_vect_idx));
       }
-      _Base::_ptr(ptr_wrapper) = info_wrapper; // get the pointer to Info inside ptr_wrapper
+      _Base::_ptr(ptr_wrapper) = &v; // get the pointer to Info inside ptr_wrapper
       //std::cout << "indice : " << current_vect_idx << std::endl;
 
       _Vect::operator[](current_vect_idx) = ptr_wrapper ; // add inside the vecteur
       current_vect_idx++;
-      _BST::insert(*info_wrapper);
+      _BST::insert(v);
 
-      return *info_wrapper;
+      return v;
     }
     else{
       // TODO can i throw an error ?
@@ -281,8 +285,6 @@ public:
   virtual ~Cont() override {};
 }; // Cont<T>
 
-template <typename T>
-class Cont < const BST<T>& > {};
 
 // Deduction guides ==========================================================
 

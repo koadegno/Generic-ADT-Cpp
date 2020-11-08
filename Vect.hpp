@@ -28,11 +28,7 @@ public:
   inline const T& operator[] (std::ptrdiff_t) const;
   // modificateurs
   inline T& operator[] (std::ptrdiff_t);
-  virtual T& insert(std::ptrdiff_t idx, const T& obj){
-    if (std::size_t(idx) >= _dim)
-    throw std::domain_error("Vect::op[]: index out of range");
-    _val[idx] = obj;
-  return _val[idx];}
+
   // copies, transferts, etc.
   Vect (const Vect& v) noexcept: _dim(v._dim), _val(_cp(v)) {}
   constexpr Vect (Vect&& v) noexcept: _dim(v._dim), _val(v._val)

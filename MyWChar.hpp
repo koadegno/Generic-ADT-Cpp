@@ -30,8 +30,7 @@ bool operator<(const MyWChar& first, const MyWChar& second) {return first.num() 
 
 std::ostream& operator<<(std::ostream& out,const MyWChar& obj)
 {
-    obj.num()==0? out<< " ":out << wchar_t(obj.num());
-
+    !obj.num()? out<< " ": out << wchar_t(obj.num());
     return out;
 
 };
