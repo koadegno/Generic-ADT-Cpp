@@ -7,18 +7,19 @@
 #include "MyWChar.hpp"
 
 
-template< typename T > void add(Cont<const BST<T>>& obj) {obj.insert(23);}
-
-using tmp = BST<int>;
 
 int main(){
 
     MyWChar test('a');
+    MyWChar test2{'s'};
     Cont<MyWChar> var(20);
 
+
     std::cout << test <<std::endl;
-    var.insert(test);
-    std::cout << var[0] <<std::endl;
+    var.insert(test); var.insert(test2);
+    //add(var);
+    std::cout << var.find(test2,1)<<std::endl;
+    std::cout << char(var[1]) <<std::endl;
 
 
 

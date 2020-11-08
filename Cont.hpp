@@ -264,9 +264,13 @@ public:
 
   const T& find (const T& v,std::ptrdiff_t idx) const noexcept {
 
-    Info val_info = Info(v);
-    if (idx == _Base::_index(_BST::find(val_info)) ){ // get the info in the BTS and then get idx of that info
-      return _BST::find(Info(v));
+
+    Ptr2Info  vect_ptr2info = _Vect::operator[](idx);
+    const Info* vect_info = _Base::_ptr(vect_ptr2info);
+
+
+    if (vect_info && v==*vect_info){
+      return *vect_info;
     }
 
     return _BST::_NOT_FOUND; // idx doesn't match
@@ -277,7 +281,8 @@ public:
   virtual ~Cont() override {};
 }; // Cont<T>
 
-
+template <typename T>
+class Cont < const BST<T>& > {};
 
 // Deduction guides ==========================================================
 
