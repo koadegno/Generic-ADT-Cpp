@@ -34,9 +34,9 @@ int main(){
 
     //Cont var(test);
 
-    auto t = var.insert(30);var.insert(3);var.insert(32);
+    var.insert(30,2);var.insert(3,3);var.insert(32,0);
 
-
+    std::cout<< var.erase(var.find(20)) <<std::endl;
     #ifdef TEST
     BST<int>* b;
 
@@ -46,8 +46,10 @@ int main(){
 
 
     //print_vect(std::cout,&var);
-
-    std::cout << var <<t<< std::endl;
+    BST<int>* t = dynamic_cast<BST<int>* >(&var);
+    //t=&var;
+    std::cout << t << std::endl;
+    std::cout << var << std::endl;
 
     return 0;
 }
