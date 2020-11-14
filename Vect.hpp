@@ -18,6 +18,7 @@ class Vect {
   std::size_t _dim = 0;
   T *_val = nullptr;
   inline static T* _cp (const Vect&);
+
 public:
   // constructeurs
   constexpr Vect () noexcept = default;   // Tableau vide
@@ -25,7 +26,7 @@ public:
 
   // observateurs
   constexpr std::size_t dim () const noexcept {return _dim;}
-  inline const T& operator[] (std::ptrdiff_t) const;
+  virtual inline const T& operator[] (std::ptrdiff_t) const;
   // modificateurs
   inline T& operator[] (std::ptrdiff_t);
 
@@ -37,6 +38,8 @@ public:
   inline Vect& operator= (Vect&&) noexcept;
   // destructeur
   ~Vect () noexcept {delete[] _val;}
+
+
 
 }; // Vect<T>
 

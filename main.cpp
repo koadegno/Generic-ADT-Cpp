@@ -1,25 +1,39 @@
 #include <iostream>
-#include "Cont.hpp"
+
 #include  "Vect.hpp"
 #include  "BST.hpp"
+#include "Cont.hpp"
 #include <cstddef>
 #include "MyChar.hpp"
 #include "MyWChar.hpp"
 
 
-#ifdef TEST
-void bst_add_int(std::ptrdiff_t idx, int value, BST<int> obj_bst) {
-    //obj_bst.insert(idx,value);
-    return;
-}
+#define TEST
 
-void print_vect(std::ostream& out, Vect<int>* obj_vect){
-    out<< "Vecteur de taille : "<<obj_vect->dim()<<std::endl << "[";
+
+#ifdef TEST
+
+template <typename V>
+max(BST<typename Cont<V>::Info>* tree){
+    Vect<typename Cont<V>::Ptr2Info>* vect = dynamic_cast< Vect<typename Cont<V>::Ptr2Info>* >(tree);
+    V biggest{};
+    for (std::size_t i=0; i < vect->dim(); i++){
+
+        V tmp = (*vect)[i];
+        std::cout << "indice : " << i <<" Value : "<< tmp <<std::endl;
+        biggest < tmp ? biggest = tmp: false;
+
+    }
+    return biggest;
+};
+
+void print_vect(const Vect<Cont<int>::Ptr2Info>* obj_vect){
+    std::cout<< "Vecteur de taille : "<<obj_vect->dim()<<std::endl << "[ ";
 
     for(std::size_t i=0; i < obj_vect->dim(); i++)
-        out << obj_vect[i];
+        std::cout << (*obj_vect)[i]<< " " ;
 
-    out << "]"<<std::endl;
+    std::cout << "]"<<std::endl;
 }
 #endif // TEST
 
@@ -34,22 +48,28 @@ int main(){
 
     //Cont var(test);
 
-    var.insert(30,2);var.insert(3,3);var.insert(32,0);
+    var.insert(30,2);var.insert(3,3);var.insert(90,0);var.insert(101,var.dim()-1);
 
-    std::cout<< var.erase(var.find(20)) <<std::endl;
-    #ifdef TEST
-    BST<int>* b;
+    BST<Cont<int>::Info>* b;
+    b = &var;
+    //auto z =  Cont<int>::Info(84);
+    //b->insert(z,4);
+    auto f = static_cast< Vect<Cont<int>::Ptr2Info>* >(&var);
 
-    BST<MyWChar> c{};
-    Cont v(c);
-    #endif // TEST
-
-
-    //print_vect(std::cout,&var);
-    BST<int>* t = dynamic_cast<BST<int>* >(&var);
-    //t=&var;
-    std::cout << t << std::endl;
+    std::cout << (*b) << std::endl;
     std::cout << var << std::endl;
+    std::cout << var.find(30) << std::endl;
+    std::cout << "\n***************"<<std::endl;
+    std::cout << (*b) << std::endl;
+    std::cout << var << std::endl;
+    std::cout << var.find(32,1) << std::endl;
+    std::cout << "\n***************"<<std::endl;
+    std::cout << (*dynamic_cast< Vect<Cont<int>::Ptr2Info>* >(b))[0] << std::endl; std::cout << "___________------__________"<<std::endl;
+    std::cout << var << std::endl;
+
+    print_vect(f);
+
+    std::cout << max<int>(b) << std::endl;
 
     return 0;
 }

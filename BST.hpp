@@ -1,7 +1,7 @@
 /* GNU C++ version 10.2 - "g++ -std=c++17"
  * Yves Roggeman - 2020/09 - <BST.hpp>
- * ADT gÃ©nÃ©rique d'arbre binaire de recherche polymorphe
- * Autorise les donnÃ©es synonymes (dans l'odre d'insertion)
+ * ADT générique d'arbre binaire de recherche polymorphe
+ * Autorise les données synonymes (dans l'odre d'insertion)
  * Copies et transferts possibles
  */
 #ifndef _BST_H_
@@ -14,7 +14,7 @@
 template <typename T>
 class BST {
 protected:
-  static constexpr const T& _NOT_FOUND{};          // "not found" element
+  static const T _NOT_FOUND;          // "not found" element
   int nb_node{};
   // Implementation
   class _Node;
@@ -61,8 +61,8 @@ public:
 }; // BST<T>
 
 
-//template <typename T>
-//const T BST<T>::_NOT_FOUND = T ();
+template <typename T>
+const T BST<T>::_NOT_FOUND{};
 
 // Embedded class _Node ======================================================
 
@@ -161,7 +161,7 @@ BST<T>& BST<T>::operator= (BST&& t) {
 
 template <typename T>
 inline std::ostream& operator<< (std::ostream& out, const BST<T>& t)
-  {out << "[ "; t._dsp(out); out << ']'; return out;}
+  {out<<"BST : "; out << "[ "; t._dsp(out); out << ']'; return out;}
 
 
 

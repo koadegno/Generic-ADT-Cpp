@@ -1,6 +1,6 @@
 /* GNU C++ version 10.2 - "g++ -std=c++17"
- * NOM, Prï¿½nom - 2020/12 - <Cont.hpp>
- * Exemple de conteneur (projet nï¿½1)
+ * Adegnon, Kokou - 2020/12 - <Cont.hpp>
+ * Exemple de conteneur (projet n°1)
  */
 #ifndef _CONT_H_
 #define _CONT_H_
@@ -12,6 +12,25 @@
 #include  <exception>
 #include  <stdexcept>           // standard exceptions
 #include  <ostream>             // output streams
+#include <iostream>
+
+
+// Common output operator ====================================================
+
+namespace _Cont_base {
+  namespace {
+    template <typename U>
+    struct _Base {
+      constexpr void _dsp (std::ostream& out) const
+        {static_cast<const U*>(this)->_dsp(out);}
+    };
+  }
+}
+
+template <typename U>
+std::ostream& operator<< (std::ostream& out, const _Cont_base::_Base<U>& b)
+  {b._dsp(out); return out;}
+
 
 // Abstract base class =======================================================
 
@@ -23,30 +42,52 @@ public:
   class Ptr2Info;
 
 protected:
-  static constexpr const Info& _EMPTY{};
+  template <typename U> using _Base = _Cont_base::_Base<U>;
+  static const Info _EMPTY;
   // Access methods
   static constexpr std::ptrdiff_t _index (const Info& i) {return i._index;}
   static constexpr std::ptrdiff_t& _index (Info& i) {return i._index;}
   static constexpr const Info* _ptr (const Ptr2Info& p) {return p._ptr;}
   static constexpr const Info*& _ptr (Ptr2Info& p) {return p._ptr;}
+
   // Implementation
-  virtual ~Cont_base()=0;
+  std::size_t _used = 0;
+  virtual void _dsp (std::ostream&) const = 0;
+
+  // Non virtual assignations => protected
+  Cont_base& operator= (const Cont_base&) = default;
+  Cont_base& operator= (Cont_base&& c)
+    {if (this != &c) {_used = c._used; c._used = 0;} return *this;}
 
   // ...
 public:
-  // ...
+  // Getter
+  constexpr std::size_t used () const noexcept {return _used;};
+  // Constructors & destructor
+  constexpr Cont_base () noexcept = default;
+  constexpr Cont_base (const Cont_base&) noexcept = default;
+  constexpr Cont_base (Cont_base&& c) noexcept: _used(c._used) {c._used = 0;}
+  virtual ~Cont_base () noexcept = default;
+
 }; // Cont_base<T>
 
 template <typename T>
-Cont_base<T>::~Cont_base() {}
+const typename Cont_base<T>::Info Cont_base<T>::_EMPTY{};
+
 
 // Embedded class Info =====================================================
 
+
+
+
 template <typename T>
-class Cont_base<T>::Info {
+class Cont_base<T>::Info:
+    public _Cont_base::_Base<typename Cont_base<T>::Info> {
   friend class Cont_base<T>;   // for _index static methods
-  std::ptrdiff_t _index = -1;  // valeur sentinelle
+  std::ptrdiff_t _index = -1;
   const T _data{};
+  friend struct _Cont_base::_Base<Info>;
+  constexpr void _dsp (std::ostream& out) const {out << _data;}
 public:
   // Traits
   using value_type      = T;
@@ -57,14 +98,28 @@ public:
   constexpr Info (std::ptrdiff_t i, const T& v) noexcept: _index(i), _data(v) {}
   constexpr Info (const T& v) noexcept: _data(v) {}             // implicit cast
   constexpr operator const T& () const noexcept {return _data;} // implicit cast
+  template <typename>
+  friend constexpr bool operator< (const Info&, const Info&) noexcept;
+  template <typename>
+  friend constexpr bool operator== (const Info&, const Info&) noexcept;
+  constexpr bool operator< (const Info& i) const noexcept
+    {return _data < i._data;}
+  constexpr bool operator== (const Info& i) const noexcept
+    {return _data == i._data;}
 }; // Info
+
+
 
 // Embedded class Ptr2Info ===================================================
 
 template <typename T>
-class Cont_base<T>::Ptr2Info {
+class Cont_base<T>::Ptr2Info:
+    public _Cont_base::_Base<typename Cont_base<T>::Ptr2Info> {
   friend class Cont_base<T>;   // for _ptr static methods
   const Info *_ptr = nullptr;
+  friend struct _Cont_base::_Base<Ptr2Info>;
+  constexpr void _dsp (std::ostream& out) const
+    {out << (_ptr ? *_ptr : _EMPTY);}
 public:
   // Traits
   using value_type      = T;
@@ -78,15 +133,23 @@ public:
     {return _ptr ? *_ptr : _EMPTY;}
   // Getter
   constexpr bool isEmpty () const noexcept {return !_ptr;}
-
-
-
+  constexpr bool operator< (const Ptr2Info& i) const noexcept
+    {return _ptr->_data < i._ptr->_data;}
+  constexpr bool operator== (const Ptr2Info& i) const noexcept
+    {return _ptr->_data == i._ptr->_data;}
 }; // Ptr2Info
+
+namespace _Cont_base {
+  template <typename> using _Base = void;   // "destroy" access to real _Base
+}
+
 
 // Main class ================================================================
 
 template <typename T>
 class Cont final: private Cont_base<T>, public BST< typename Cont_base<T>::Info >, public Vect< typename Cont_base<T>::Ptr2Info >  {
+
+private:
   using _Base = Cont_base<T>;
   using _Vect = Vect<typename _Base::Ptr2Info >;
   using _BST  = BST<typename _Base::Info>;
@@ -95,6 +158,7 @@ class Cont final: private Cont_base<T>, public BST< typename Cont_base<T>::Info 
 
   std::size_t DIM;
 
+  virtual void _dsp (std::ostream& out) const override {_BST::_dsp(out);}
 
   // ...
 public:
@@ -111,7 +175,6 @@ public:
 
   explicit Cont (std::size_t taille ): _Base(), _Vect(taille),DIM(taille){};
 
-  Cont (const Vect<T>& obj):_Vect(obj) {std::cout << "je suis call "<< std::endl;}
 
   Cont(const Cont& other)noexcept:_Base(other),_BST(other),_Vect(other),DIM(other.DIM){};
 
@@ -140,14 +203,14 @@ public:
   }
 
   // Getter
-  const T& operator[](std::ptrdiff_t idx) const {
-    auto val= _Vect::operator[](idx);
+  const T& operator[](std::ptrdiff_t idx) {
+
     //std::cout << val << std::endl;
-    return val;
+    return _Vect::operator[](idx);
   };
 
 
-  int const node_number () const {
+  std::size_t const node_number () const {
     return _BST::node_number();}
 
 
@@ -155,12 +218,14 @@ public:
     return DIM;}
 
 
+
+  // methode
   const T& insert (const T& v, std::ptrdiff_t idx)  {
 
     Info* info_wrapper = new Info(idx,v);
     Ptr2Info ptr_wrapper{};
 
-    bool cond_to_ins = _BST::exists(*info_wrapper);
+    bool cond_to_ins = _BST::exists(*info_wrapper) && node_number()< DIM;
     //printf("nb d'element : %d \n",_BST::node_number());
 
     if (!cond_to_ins && (std::size_t)idx < DIM){
@@ -187,21 +252,33 @@ public:
   }
 
 
-  bool erase(const Info& v,std::ptrdiff_t idx=-1) {
-    //Info info_wrapper = Info(v);
+  bool erase(const Info& v) override {
     bool cond_to_del = _BST::exists(v);
 
     if (cond_to_del){
 
       auto the_info = _BST::find(v);
-      idx == -1 ? idx = _Base::_index(the_info):false;
+      std::ptrdiff_t idx = _Base::_index(the_info);
 
-      if (_Vect::operator[](idx) == v ){ // exist in BTS and Vect
-
-        _BST::erase(the_info); _Vect::operator[](idx) = Ptr2Info{}; // erase from everywhere (BST and Vect)
-        return true;
+      _BST::erase(v); _Vect::operator[](idx) = Ptr2Info{}; // erase from everywhere (BST and Vect)
+      return true;
       }
-    };
+    std::cout << "\nExiste pas, Value : "<< v << std::endl;
+    return false;
+
+  }
+
+
+  bool erase(const Info& v,std::ptrdiff_t idx) {
+    //Info info_wrapper = Info(v);
+
+
+    if (_Vect::operator[](idx) == v ){ // exist in BTS and Vect
+
+      _BST::erase(v); _Vect::operator[](idx) = Ptr2Info{}; // erase from everywhere (BST and Vect)
+      return true;
+      }
+
 
     // TODO modifier le cout
     std::cout << "\nExiste pas, Value and index : "<< v <<" "<< idx<< std::endl;
@@ -216,15 +293,19 @@ public:
   };
 
 
-  const Info& find (const Info& v,std::ptrdiff_t idx=-1) const noexcept {
+  const Info& find(const Info& v) const noexcept override {
 
-    if (idx==-1) return _BST::find(v); // simple find value
-
-    const Ptr2Info& vect_ptr2info = _Vect::operator[](idx);
-    const Info* vect_info = _Base::_ptr(vect_ptr2info);
+    return _BST::find(v);
+  }
 
 
-    if (vect_info && v==*vect_info){
+  const Info& find (const Info& v,std::ptrdiff_t idx) const noexcept  {
+
+    const Ptr2Info& vect_ptr2info = _Vect::operator[](idx); // get the Ptr2info in the vect
+    const Info* vect_info = _Base::_ptr(vect_ptr2info); // get Info in Ptr2Info
+
+
+    if (vect_info && v==*vect_info){ // not empty and v equal info in the vect
       return *vect_info;
     }
 
@@ -233,7 +314,13 @@ public:
   };
 
 
-  virtual ~Cont() override {};
+  ~Cont() override {};
+
+  template <typename I>
+  friend inline std::ostream& operator<< (std::ostream& , const Cont<I>&);
+
+
+
 }; // Cont<T>
 
 
@@ -244,5 +331,12 @@ Cont (const Vect<T>&) -> Cont<typename T::value_type>;
 
 template <typename T>
 Cont (const BST<T>&) -> Cont<typename T::value_type>;
+
+// Associated functions ======================================================
+
+
+template <typename T>
+inline std::ostream& operator<< (std::ostream& out, const Cont<T>& c)
+  {out << "CONT : [ "; c._dsp(out); out << ']'; return out;}
 
 #endif // _CONT_H_
