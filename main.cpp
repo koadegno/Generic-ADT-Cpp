@@ -46,11 +46,23 @@ const V min(const BST<typename Cont<V>::Info>* tree){
 
 
 template<typename K>
-std::ptrdiff_t index(Vect<typename Cont<K>::Ptr2Info>* vecteur,const K& to_search){
+const std::ptrdiff_t index(const BST<typename Cont<K>::Info>* tree,const K& to_search){
+    std::ptrdiff_t ret_val = -1;
+    if (tree->exists(to_search)){
+        K val = 0;
+        const Vect<typename Cont<K>::Ptr2Info>* vect = dynamic_cast<const Vect<typename Cont<K>::Ptr2Info>* >(tree);
+        for(std::size_t i =0; i< vect->dim(); i++){
+            val = (*vect)[i];
+            if( val == to_search){ret_val = i;break;}
 
-    vecteur->find(to_search);
-    return -1;
+        };
+    }
+    return ret_val;
+}
 
+template<typename K>
+void clear(Vect< typename Cont<K>::Ptr2Info >* vecteur){
+    delete *vecteur;
 }
 
 void print_vect(const Vect<Cont<int>::Ptr2Info>* obj_vect){
@@ -77,7 +89,9 @@ int main(){
     var.insert(30,2);var.insert(3,3);var.insert(90,0);var.insert(101,var.dim()-1);var.insert(6,1);
 
     BST<Cont<int>::Info>* b;
+    Vect<Cont<int>::Ptr2Info>* c;
     b = &var;
+    c = &var;
     //auto z =  Cont<int>::Info(84);
     //b->insert(z,4);
     auto f = static_cast< Vect<Cont<int>::Ptr2Info>* >(&var);
@@ -98,8 +112,14 @@ int main(){
     printf("\n\nFunction to print Cont\n\n");
     print_vect(f);
 
-    std::cout<<"\n----------------------------------\nFind the max " <<std::endl;
+    std::cout<<"\n----------------------------------\nFind the max and the index of a value " <<std::endl;
     std::cout << min<int>(b) << std::endl;
+
+    std::cout << index<int>(b,3) << std::endl;
+
+    std::cout<<"\n----------------------------------\Clear the Cont " <<std::endl;
+    clear<int>(c);
+    std::cout << var << std::endl;
 
     return 0;
 }

@@ -287,7 +287,7 @@ public:
   }
 
 
-  bool exists  (const T& v) const {
+  bool exists  (const Info& v) const noexcept override{
         auto val = _BST::exists(Info(v));
         return val;
   };
