@@ -15,7 +15,7 @@ template <typename T>
 class BST {
 protected:
   static const T _NOT_FOUND;          // "not found" element
-  int nb_node{};
+  std::size_t nb_node{};
   // Implementation
   class _Node;
   _Node *_root = nullptr;
@@ -57,7 +57,7 @@ public:
 
   // Implemantation
 
-  inline int const node_number() const {return nb_node;}
+  inline std::size_t const node_number() const {return nb_node;}
 }; // BST<T>
 
 

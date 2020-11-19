@@ -37,7 +37,7 @@ public:
   inline Vect& operator= (const Vect&) noexcept;
   inline Vect& operator= (Vect&&) noexcept;
   // destructeur
-  ~Vect () noexcept {delete[] _val;}
+  virtual ~Vect () noexcept {delete[] _val;}
 
 
 
