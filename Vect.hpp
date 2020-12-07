@@ -1,7 +1,7 @@
 
 /* GNU C++ version 10.2 - "g++ -std=c++17"
  * Yves Roggeman - 2020/09 - <Vect.hpp>
- * ADT de vecteur dynamique (taille variable) et paramétrique (template)
+ * ADT de vecteur dynamique (taille variable) et paramï¿½trique (template)
  * Copies et transferts possibles
  */
 #ifndef _Vect_H_
@@ -36,6 +36,7 @@ public:
     {v._dim = 0; v._val = nullptr;}
   inline Vect& operator= (const Vect&) noexcept;
   inline Vect& operator= (Vect&&) noexcept;
+  std::ptrdiff_t getIndex();
   // destructeur
   virtual ~Vect () noexcept {delete[] _val;}
 
@@ -43,7 +44,19 @@ public:
 
 }; // Vect<T>
 
-// constructeurs ============================================================
+
+// methode ============================================================
+template<typename T>
+std::ptrdiff_t Vect<T>::getIndex(){
+  
+  for(std::ptrdiff_t i = 0; i < _dim;i++){
+    if((_val[i]).isEmpty()){
+      return i;
+    }
+  }
+
+  return -1;
+} 
 
 
 // observateurs =============================================================

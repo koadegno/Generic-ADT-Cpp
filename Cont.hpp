@@ -1,18 +1,18 @@
 /* GNU C++ version 10.2 - "g++ -std=c++17"
  * Adegnon, Kokou - 2020/12 - <Cont.hpp>
- * Exemple de conteneur (projet n°1)
+ * Exemple de conteneur (projet n1)
  */
 #ifndef _CONT_H_
 #define _CONT_H_
 
 #include  "Vect.hpp"
 #include  "BST.hpp"
-#include  <cstddef>             // nullptr_t, size_t, ptrdiff_t, byte...
+//#include  <cstddef>             // nullptr_t, size_t, ptrdiff_t, byte...
 #include  <utility>             // swap, move, forward...
-#include  <exception>
-#include  <stdexcept>           // standard exceptions
-#include  <ostream>             // output streams
-#include <iostream>
+//#include  <exception>
+//#include  <stdexcept>           // standard exceptions
+//#include  <ostream>             // output streams
+#include  <iostream>
 
 
 // Common output operator ====================================================
@@ -77,9 +77,6 @@ const typename Cont_base<T>::Info Cont_base<T>::_EMPTY{};
 
 // Embedded class Info =====================================================
 
-
-
-
 template <typename T>
 class Cont_base<T>::Info:
     public _Cont_base::_Base<typename Cont_base<T>::Info> {
@@ -107,8 +104,6 @@ public:
   constexpr bool operator== (const Info& i) const noexcept
     {return _data == i._data;}
 }; // Info
-
-
 
 // Embedded class Ptr2Info ===================================================
 
@@ -142,7 +137,6 @@ public:
 namespace _Cont_base {
   template <typename> using _Base = void;   // "destroy" access to real _Base
 }
-
 
 // Main class ================================================================
 
@@ -217,8 +211,6 @@ public:
   std::size_t const dim() const {
     return DIM;}
 
-
-
   // methode
   const T& insert (const T& v, std::ptrdiff_t idx)  {
 
@@ -226,13 +218,11 @@ public:
     Ptr2Info ptr_wrapper{};
 
     bool cond_to_ins = _BST::exists(*info_wrapper) && node_number()< DIM;
-    //printf("nb d'element : %d \n",_BST::node_number());
 
-    if (!cond_to_ins && (std::size_t)idx < DIM){
+    if (!cond_to_ins && idx < DIM){
 
-      if ( _Base::_ptr(_Vect::operator[](idx)) != nullptr ){ // at idx there is != nullptr
+      if ( _Base::_ptr(_Vect::operator[](idx)) != nullptr ){ // write on a existing value
         _BST::erase(_Vect::operator[](idx));
-        std::cout<< "pb regs ici stp";
       }
 
       _Base::_ptr(ptr_wrapper) = info_wrapper; // get the reference to pointer to Info inside ptr_wrapper
@@ -251,6 +241,13 @@ public:
 
   }
 
+  const Info& insert (const Info& val) override{
+
+    std::ptrdiff_t idx = _Vect::getIndex();
+    const Info& ret_val = insert(val,idx);
+    return ret_val;
+
+  }
 
   bool erase(const Info& v) override {
     bool cond_to_del = _BST::exists(v);
@@ -325,13 +322,14 @@ public:
 
 
 // Deduction guides ==========================================================
-
+/*
 template <typename T>
 Cont (const Vect<T>&) -> Cont<typename T::value_type>;
 
 template <typename T>
 Cont (const BST<T>&) -> Cont<typename T::value_type>;
 
+*/
 // Associated functions ======================================================
 
 

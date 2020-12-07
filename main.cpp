@@ -60,10 +60,7 @@ const std::ptrdiff_t index(const BST<typename Cont<K>::Info>* tree,const K& to_s
     return ret_val;
 }
 
-template<typename K>
-void clear(Vect< typename Cont<K>::Ptr2Info >* vecteur){
-    delete *vecteur;
-}
+
 
 void print_vect(const Vect<Cont<int>::Ptr2Info>* obj_vect){
     std::cout<< "Vecteur de taille : "<<obj_vect->dim()<<std::endl << "[ ";
@@ -81,44 +78,11 @@ int main(){
 
     Cont<int>var{5};
 
-    Vect<int> test(10);
-    test[0] = 2; test[2] = 4;
-
     //Cont var(test);
 
-    var.insert(30,2);var.insert(3,3);var.insert(90,0);var.insert(101,var.dim()-1);var.insert(6,1);
+    var.insert(30);
+    var.insert(3,3);var.insert(90,0);var.insert(101);var.insert(6,2);
 
-    BST<Cont<int>::Info>* b;
-    Vect<Cont<int>::Ptr2Info>* c;
-    b = &var;
-    c = &var;
-    //auto z =  Cont<int>::Info(84);
-    //b->insert(z,4);
-    auto f = static_cast< Vect<Cont<int>::Ptr2Info>* >(&var);
-
-    std::cout <<"Find value 30\n";
-    std::cout << (*b) << std::endl;
-    std::cout << var << std::endl;
-    std::cout << var.find(30) << std::endl;
-    std::cout << "\n***************"<<std::endl;
-    std::cout <<"Find value 32 with index 1\n";
-    std::cout << (*b) << std::endl;
-    std::cout << var << std::endl;
-    std::cout << var.find(32,1) << std::endl;
-    std::cout << "\n***************"<<std::endl;
-    std::cout << (*dynamic_cast< Vect<Cont<int>::Ptr2Info>* >(b))[0] << std::endl; std::cout << "___________------__________"<<std::endl;
-    std::cout << var << std::endl;
-
-    printf("\n\nFunction to print Cont\n\n");
-    print_vect(f);
-
-    std::cout<<"\n----------------------------------\nFind the max and the index of a value " <<std::endl;
-    std::cout << min<int>(b) << std::endl;
-
-    std::cout << index<int>(b,3) << std::endl;
-
-    std::cout<<"\n----------------------------------\Clear the Cont " <<std::endl;
-    clear<int>(c);
     std::cout << var << std::endl;
 
     return 0;
