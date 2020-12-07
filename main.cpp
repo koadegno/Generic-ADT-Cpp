@@ -46,7 +46,7 @@ const V min(const BST<typename Cont<V>::Info>* tree){
 
 
 template<typename K>
-const std::ptrdiff_t index(const BST<typename Cont<K>::Info>* tree,const K& to_search){
+const std::ptrdiff_t index(const BST<typename Cont<K>::Info>* tree, const K& to_search){
     std::ptrdiff_t ret_val = -1;
     if (tree->exists(to_search)){
         K val = 0;
@@ -61,8 +61,8 @@ const std::ptrdiff_t index(const BST<typename Cont<K>::Info>* tree,const K& to_s
 }
 
 
-
-void print_vect(const Vect<Cont<int>::Ptr2Info>* obj_vect){
+template<typename K>
+void print_vect(const Vect<typename Cont<K>::Ptr2Info>* obj_vect){
     std::cout<< "Vecteur de taille : "<<obj_vect->dim()<<std::endl << "[ ";
 
     for(std::size_t i=0; i < obj_vect->dim(); i++)
@@ -73,17 +73,25 @@ void print_vect(const Vect<Cont<int>::Ptr2Info>* obj_vect){
 #endif // TEST
 
 
+void Test1(){
+
+    char mot[] = "Adegno";
+    std::size_t motSize = 6;
+    Cont<MyChar> mycharCont(motSize);
+    
+    for (std::size_t i= 0; i< motSize; i++){
+        mycharCont.insert(MyWChar(mot[i]),i);
+        
+    };
+
+    std::cout << mycharCont<< std::endl;
+    //print_vect(mycharCont);
+    
+
+}
+
 int main(){
 
-
-    Cont<int>var{5};
-
-    //Cont var(test);
-
-    var.insert(30);
-    var.insert(3,3);var.insert(90,0);var.insert(101);var.insert(6,2);
-
-    std::cout << var << std::endl;
-
+    Test1();
     return 0;
 }
