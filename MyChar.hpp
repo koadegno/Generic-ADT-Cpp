@@ -34,7 +34,7 @@ bool operator<(const MyChar& first, const MyChar& second) {return first._val < s
 
 std::ostream& operator<<(std::ostream& out,const MyChar& obj)
 {
-    obj.num()==0? out<< " ":out << char(obj.num());
+    obj.num()==0? out<< " ":out << static_cast<char>(obj);
     return out;
 
 };
