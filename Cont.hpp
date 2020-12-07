@@ -212,7 +212,7 @@ public:
     return DIM;}
 
   // methode
-  const T& insert (const T& v, std::ptrdiff_t idx)  {
+  const Info& insert (const T& v, std::ptrdiff_t idx)  {
 
     Info* info_wrapper = new Info(idx,v);
     Ptr2Info ptr_wrapper{};
@@ -228,15 +228,14 @@ public:
       _Base::_ptr(ptr_wrapper) = info_wrapper; // get the reference to pointer to Info inside ptr_wrapper
       _Vect::operator[](idx) = ptr_wrapper ; // add inside the vecteur
       //std::cout << "Value : " << _Vect::operator[](idx) << " Index : " << idx << std::endl;
-      auto val = _BST::insert(*info_wrapper);
-
       //delete info_wrapper;
-      return val;
+      return _BST::insert(*info_wrapper);
+
     }
 
         // TODO can i throw an error ?
         //throw std::domain_error("Already in ... ");
-    std::cout<< "Insert n2\nDeja dedans ou Plus assez de place !!\nValue : "<< v <<std::endl;
+    std::cout<< "Insert \nDeja dedans ou Plus assez de place !!\nValue : "<< v <<std::endl;
     return _BST::_NOT_FOUND;
 
   }
