@@ -28,14 +28,14 @@ public:
   constexpr std::size_t dim () const noexcept {return _dim;}
   virtual inline const T& operator[] (std::ptrdiff_t) const;
   // modificateurs
-  inline T& operator[] (std::ptrdiff_t);
+  virtual inline T& operator[] (std::ptrdiff_t);
 
   // copies, transferts, etc.
   Vect (const Vect& v) noexcept: _dim(v._dim), _val(_cp(v)) {}
   constexpr Vect (Vect&& v) noexcept: _dim(v._dim), _val(v._val)
     {v._dim = 0; v._val = nullptr;}
-  inline Vect& operator= (const Vect&) noexcept;
-  inline Vect& operator= (Vect&&) noexcept;
+  virtual inline Vect& operator= (const Vect&) noexcept;
+  virtual inline Vect& operator= (Vect&&) noexcept;
   std::ptrdiff_t getIndex();
   // destructeur
   virtual ~Vect () noexcept {delete[] _val;}
@@ -49,7 +49,7 @@ public:
 template<typename T>
 std::ptrdiff_t Vect<T>::getIndex(){
   
-  for(std::ptrdiff_t i = 0; i < _dim;i++){
+  for(std::ptrdiff_t i = 0; std::size_t(i) < _dim;i++){
     if((_val[i]).isEmpty()){
       return i;
     }

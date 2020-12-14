@@ -1,7 +1,7 @@
 /* GNU C++ version 10.2 - "g++ -std=c++17"
  * Yves Roggeman - 2020/09 - <BST.hpp>
- * ADT générique d'arbre binaire de recherche polymorphe
- * Autorise les données synonymes (dans l'odre d'insertion)
+ * ADT gï¿½nï¿½rique d'arbre binaire de recherche polymorphe
+ * Autorise les donnï¿½es synonymes (dans l'odre d'insertion)
  * Copies et transferts possibles
  */
 #ifndef _BST_H_
@@ -15,7 +15,6 @@ template <typename T>
 class BST {
 protected:
   static const T _NOT_FOUND;          // "not found" element
-  std::size_t nb_node{};
   // Implementation
   class _Node;
   _Node *_root = nullptr;
@@ -27,6 +26,11 @@ protected:
 private:
   static _Node* _cp (const _Node* r) noexcept     // idem
     {return r ? new _Node(*r) : nullptr;}
+
+  std::size_t sizeTree(const BST* node) const 
+    { if(!node->_root){return 0;}
+      else{return 1 + sizeTree(&((node->_root)->left)) + sizeTree(&((node->_root)->right));}
+    }
 public:
   // Constructors
   constexpr BST () noexcept = default;            // Empty tree
@@ -41,9 +45,9 @@ public:
   inline void traverse (Fct, Args...) const;
   // Setters
   virtual const T& insert (const T& v)            // always add
-    {nb_node++; return (_nextLeaf(v) = new _Node(v))->info;}
+    {return (_nextLeaf(v) = new _Node(v))->info;}
   virtual bool erase (const T& v)                 // false if doesn't exist
-    {_Node *res = _erase(_findNode(v));nb_node--; delete res; return res;}
+    {_Node *res = _erase(_findNode(v)); delete res; return res;}
   // Copies & transfers
   BST (const BST& t) noexcept: _root(_cp(t._root)) {}
   constexpr BST (BST&& t) noexcept: _root(t._root) {t._root = nullptr;}
@@ -56,8 +60,7 @@ public:
   friend inline std::ostream& operator<< (std::ostream&, const BST<U>&);
 
   // Implemantation
-
-  inline std::size_t const node_number() const {return nb_node;}
+  std::size_t node_number() const {return this->sizeTree(this);}
 }; // BST<T>
 
 
@@ -94,7 +97,7 @@ void BST<T>::_dsp (std::ostream& out) const {
     _root->right._dsp(out); out << ')';
   }
 #else   // _BST_DBG_
-  traverse([&out](const T& v){out << v << ' ';});
+  traverse([&out](const T& v){out << v << ", ";});
 #endif  // _BST_DBG_
 }
 
@@ -147,13 +150,13 @@ typename BST<T>::_Node* BST<T>::_erase (_Node*& target) noexcept {
 
 template <typename T>
 BST<T>& BST<T>::operator= (const BST& t) {
-  if (this != &t) {nb_node=t.nb_node;delete _root; _root = _cp(t._root);}
+  if (this != &t) {delete _root; _root = _cp(t._root);}
   return *this;
 }
 
 template <typename T>
 BST<T>& BST<T>::operator= (BST&& t) {
-  if (this != &t) {nb_node=t.nb_node; t.nb_node=0 ;delete _root; _root = t._root; t._root = nullptr;}
+  if (this != &t) {delete _root; _root = t._root; t._root = nullptr;}
   return *this;
 }
 

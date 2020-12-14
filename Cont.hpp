@@ -7,11 +7,11 @@
 
 #include  "Vect.hpp"
 #include  "BST.hpp"
-//#include  <cstddef>             // nullptr_t, size_t, ptrdiff_t, byte...
+#include  <cstddef>             // nullptr_t, size_t, ptrdiff_t, byte...
 #include  <utility>             // swap, move, forward...
-//#include  <exception>
-//#include  <stdexcept>           // standard exceptions
-//#include  <ostream>             // output streams
+#include  <exception>
+#include  <stdexcept>           // standard exceptions
+#include  <ostream>             // output streams
 #include  <iostream>
 
 
@@ -153,7 +153,8 @@ private:
   std::size_t DIM;
 
   virtual void _dsp (std::ostream& out) const override {_BST::_dsp(out);}
-
+  using _Vect::operator[];
+  
   // ...
 public:
   // Traits
@@ -177,8 +178,9 @@ public:
     other.DIM = 0;
   }
 
-  Cont& operator= (const Cont& other){
+  Cont& operator= (const Cont<T>& other)noexcept {
     if(this!= &other){
+
       _Vect::operator=(other);
       _BST::operator=(other);
       DIM = other.DIM;
@@ -186,29 +188,58 @@ public:
     return *this;
   }
 
-  Cont& operator= ( Cont&& other){
+  Cont& operator= (const _Vect& other)noexcept override{
     if(this!= &other){
+
       _Vect::operator=(other);
+      _BST::operator=(dynamic_cast<const _BST&>(other));
+      DIM = (static_cast<const Cont<T>&>(other)).DIM;
+    }
+    return *this;
+  }
+  Cont& operator= (_Vect&& other)noexcept override{
+    if(this!= &other){
+
+      _Vect::operator=(other);
+      _BST::operator=(dynamic_cast<const _BST&>(other));
+      DIM = (static_cast<const Cont<T>&>(other)).DIM;
+    }
+    return *this;
+  }
+  Cont& operator= (const _BST& other) override {
+    if(this!= &other){
+
+      _Vect::operator=(dynamic_cast<const _Vect&>(other));
       _BST::operator=(other);
-      DIM = other.DIM; other.DIM = 0;
+      DIM = (static_cast<const Cont<T>&>(other)).DIM;
+    }
+    return *this;
+  }
+
+  Cont& operator= (_BST&& other) override{
+    if(this!= &other){
+      _Vect::operator=(dynamic_cast<_Vect&>(other));
+      _BST::operator=(other);
+      DIM = (static_cast<Cont<T>&>(other)).DIM;
+      (static_cast<Cont<T>&>(other)).DIM = 0;
 
     }
     return *this;
   }
 
   // Getter
-  const T& operator[](std::ptrdiff_t idx) {
+  inline const Ptr2Info& operator[](std::ptrdiff_t idx) const override {
 
     //std::cout << val << std::endl;
     return _Vect::operator[](idx);
   };
 
 
-  std::size_t const node_number () const {
+  std::size_t node_number () const {
     return _BST::node_number();}
 
 
-  std::size_t const dim() const {
+  std::size_t dim() const {
     return DIM;}
 
   // methode
@@ -219,7 +250,7 @@ public:
 
     bool cond_to_ins = _BST::exists(*info_wrapper) && node_number()< DIM;
 
-    if (!cond_to_ins && idx < DIM){
+    if (!cond_to_ins && std::size_t(idx) < DIM){
 
       if ( _Base::_ptr(_Vect::operator[](idx)) != nullptr ){ // write on a existing value
         _BST::erase(_Vect::operator[](idx));
@@ -234,8 +265,8 @@ public:
     }
 
         // TODO can i throw an error ?
-        //throw std::domain_error("Already in ... ");
-    std::cout<< "Insert \nDeja dedans ou Plus assez de place !!\nValue : "<< v <<std::endl;
+    throw std::domain_error("Already in ... ");
+    
     return _BST::_NOT_FOUND;
 
   }
@@ -250,7 +281,7 @@ public:
 
   bool erase(const Info& v) override {
     bool cond_to_del = _BST::exists(v);
-
+    
     if (cond_to_del){
 
       auto the_info = _BST::find(v);
@@ -264,11 +295,10 @@ public:
 
   }
 
-
   bool erase(const Info& v,std::ptrdiff_t idx) {
     //Info info_wrapper = Info(v);
 
-
+  
     if (_Vect::operator[](idx) == v ){ // exist in BTS and Vect
 
       _BST::erase(v); _Vect::operator[](idx) = Ptr2Info{}; // erase from everywhere (BST and Vect)
@@ -282,18 +312,15 @@ public:
 
   }
 
-
   bool exists  (const Info& v) const noexcept override{
         auto val = _BST::exists(Info(v));
         return val;
   };
 
-
   const Info& find(const Info& v) const noexcept override {
 
     return _BST::find(v);
   }
-
 
   const Info& find (const Info& v,std::ptrdiff_t idx) const noexcept  {
 
@@ -321,14 +348,14 @@ public:
 
 
 // Deduction guides ==========================================================
-/*
+
 template <typename T>
 Cont (const Vect<T>&) -> Cont<typename T::value_type>;
 
 template <typename T>
 Cont (const BST<T>&) -> Cont<typename T::value_type>;
 
-*/
+
 // Associated functions ======================================================
 
 
