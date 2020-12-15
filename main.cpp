@@ -61,6 +61,20 @@ void print_vect(const Vect<typename Cont<K>::Ptr2Info>* obj_vect){
     std::cout << "]"<<std::endl;
 }
 
+template<typename K>
+void init_pers(BST<typename Cont<K>::Info>* obj_bst, std::size_t taille){
+
+    srand(7892458);
+    for (std::ptrdiff_t i = 0; std::size_t(i)< taille; i++){
+        
+        obj_bst->insert({i,Personne('J',rand()%70)});
+    }
+}
+
+template<typename K>
+void del(BST<typename Cont<K>::Info>* obj_bst,const K& to_del){
+    obj_bst->erase(to_del);
+}
 
 void Test1(){
 
@@ -71,69 +85,70 @@ void Test1(){
     wordTree = &mycharCont;
 
     for (std::size_t i= 0; i< motSize; i++){
-        wordTree->insert(MyChar(mot[i]));
+        wordTree->insert({std::ptrdiff_t(i),MyChar(mot[i])});
         
     };
 
     std::cout <<"Le conteneur : "<< mycharCont<< std::endl;
     
     auto tmp = min<MyChar>(&mycharCont);
-    std::cout << "min value : "<<tmp<<std::endl;
+    std::cout << "min value delete : "<<tmp<<std::endl;
     std::ptrdiff_t idx = index<MyChar>(&mycharCont,tmp);
-    mycharCont.erase(tmp,idx);
+    mycharCont.erase({idx,tmp});
     std::cout <<"Le conteneur : "<< *wordTree<< std::endl;
-    mycharCont.insert(tmp,5);
+    mycharCont.insert({5,tmp});
     std::cout <<"Le conteneur : "<< *wordTree<< std::endl;
 
     tmp = max<MyChar>(&mycharCont);
     std::cout << "max value delete : " << tmp << std::endl;
-    mycharCont.erase(max<MyChar>(&mycharCont),index<MyChar>(&mycharCont,tmp));
+    mycharCont.erase({index<MyChar>(&mycharCont,tmp),max<MyChar>(&mycharCont)});
     std::cout <<"Le conteneur : "<< *wordTree<< std::endl;
     tmp = max<MyChar>(&mycharCont);
     std::cout << "max value delete : " << tmp << std::endl;
-    wordTree->erase(tmp);
+    wordTree->erase({tmp});
 
     std::cout <<"Le conteneur : "<< *wordTree<< std::endl;
     for (MyChar elem: mot){
-        if (mycharCont.exists(elem)){
-            wordTree->erase(elem);
+        if (mycharCont.exists({elem})){
+            wordTree->erase({elem});
         }
     }
     std::cout <<"Le conteneur : "<< mycharCont<< std::endl;
 
     for (std::ptrdiff_t i= 0; std::size_t(i)< motSize; i++){
-        mycharCont.insert(MyChar(mot[i]),i);
+        mycharCont.insert({i,MyChar(mot[i])});
         
     };
 
     std::cout <<"Le conteneur : "<< mycharCont<< std::endl;
-
+    std::cout << std::endl;
 
 }
 
 
 void Test2(){
+    
     Cont<int> ageCont{10};
     
     
     Cont<Personne> persCont{10};
-    for (std::ptrdiff_t i = 0; std::size_t(i)< persCont.dim(); i++){
-        
-        try
-        {
-            persCont.insert(Personne{"Satie",rand()%70},i);
-        }
-        catch(const std::exception& e)
-        {
-            std::cerr << e.what() << '\n';
-        };
-        
-        
-    }
-
-    
+    init_pers<Personne>(&persCont,persCont.dim());
 
     std::cout << persCont << std::endl;
+
+    std::cout << persCont[0] << std::endl;
+    //print_vect<Personne>(&persCont);
+    /*for(std::ptrdiff_t i = 0; i < 2; i++){
+        
+        const Personne to_sup = min<Personne>(&persCont);
+        std::cout << to_sup << std::endl;
+        del<Personne>(&persCont,to_sup);
+    }*/
+
+    std::cout << persCont << std::endl;
+
+
+    
 
 }
 

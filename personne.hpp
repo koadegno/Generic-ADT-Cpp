@@ -7,28 +7,26 @@
 
 
 class Personne
-/* Represente un personne, cette personne peut etre infecter par une maladie.*/
+/* Represente un personne, cette personne possedant un age*/
 {
-    std::string _prenom;
-    std::string _nom;
+    char _initiale;
+    int _age;
     friend std::ostream& operator<< (std::ostream&,const Personne&);
     friend bool operator==(const Personne& first, const Personne& second);
     friend bool operator<(const Personne& first, const Personne& second);
-    int _age;
+    
 public:
-        Personne() noexcept; 
-        Personne(std::string prenom,std::string nom = "",int age = 1);
-        Personne(std::string nom,int age):_prenom("Erik") ,_nom(nom),_age(age){}
+        constexpr Personne(char init ='V',int age = 4) noexcept:_initiale(init),_age(age){}
+
         ~Personne(){}
         
-        Personne& operator=(const Personne &copy)= delete;
+        Personne& operator=(const Personne &copy) {_initiale = copy._initiale; _age = copy._age; return *this;};
         inline bool operator==(const Personne& second){return _age == second._age;}
         inline bool operator<(const Personne& second){return _age < second._age;}
 
-        const std::string info_pers() const;
 };
 
-//============ code ================================
+//====================== code ================================
 
 bool operator==(const Personne& first, const Personne& second){
     return first._age == second._age;
@@ -39,24 +37,12 @@ bool operator<(const Personne& first, const Personne& second){
 }
 
 std::ostream& operator<<(std::ostream& out, const Personne& obj){
-    out<< obj.info_pers();
+    out<<obj._initiale<<"- "<<obj._age<< " ans";
     return out;
+
+    
 }
 
-Personne::Personne()noexcept:_prenom("Jean"),_nom("Dupont"),_age(35){}
-/* Constructeur avec parametre par defaut*/
-
-
-Personne::Personne(std::string prenom ,std::string nom , int age ):
-_prenom(prenom),_nom(nom),_age(age){}
-
-
-const std::string Personne::info_pers() const
-/* return les infos sur la personne*/
-{
-    std::string info;info = _nom + " " +_prenom+ " "+ std::to_string(_age)+" ans";
-    return info;
-}
 
 
 #endif

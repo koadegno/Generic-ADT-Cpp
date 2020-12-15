@@ -228,10 +228,11 @@ public:
   }
 
   // Getter
-  inline const Ptr2Info& operator[](std::ptrdiff_t idx) const override {
+  const Info& operator[](std::ptrdiff_t idx) const {
 
     //std::cout << val << std::endl;
-    return _Vect::operator[](idx);
+    auto out = _Vect::operator[](idx);
+    return out;
   };
 
 
@@ -243,94 +244,80 @@ public:
     return DIM;}
 
   // methode
-  const Info& insert (const T& v, std::ptrdiff_t idx)  {
+  const Info& insert (const Info& v) override {
 
-    Info* info_wrapper = new Info(idx,v);
-    Ptr2Info ptr_wrapper{};
+    ptrdiff_t idx = _Base::_index(v);
+    Ptr2Info ptr_wrapper{}; _Base::_ptr(ptr_wrapper) = &v; //get ref to Info
+    bool already_in = _BST::exists(v);
 
-    bool cond_to_ins = _BST::exists(*info_wrapper) && node_number()< DIM;
+    if (node_number() < DIM && std::size_t(idx) < DIM){
 
-    if (!cond_to_ins && std::size_t(idx) < DIM){
-
-      if ( _Base::_ptr(_Vect::operator[](idx)) != nullptr ){ // write on a existing value
-        _BST::erase(_Vect::operator[](idx));
+      if (already_in){ 
+        if ( _Base::_ptr(_Vect::operator[](idx)) != nullptr ){ // write on a existing value
+          _BST::erase(_Vect::operator[](idx));
+          }
+    
       }
 
-      _Base::_ptr(ptr_wrapper) = info_wrapper; // get the reference to pointer to Info inside ptr_wrapper
-      _Vect::operator[](idx) = ptr_wrapper ; // add inside the vecteur
-      //std::cout << "Value : " << _Vect::operator[](idx) << " Index : " << idx << std::endl;
-      //delete info_wrapper;
-      return _BST::insert(*info_wrapper);
-
+      _Vect::operator[](idx) = ptr_wrapper ; 
+      return _BST::insert(v);
     }
-
-        // TODO can i throw an error ?
-    throw std::domain_error("Already in ... ");
     
     return _BST::_NOT_FOUND;
-
   }
 
-  const Info& insert (const Info& val) override{
-
-    std::ptrdiff_t idx = _Vect::getIndex();
-    const Info& ret_val = insert(val,idx);
-    return ret_val;
-
-  }
-
+ 
   bool erase(const Info& v) override {
-    bool cond_to_del = _BST::exists(v);
     
-    if (cond_to_del){
 
+    bool res = false;
+    std::ptrdiff_t idx = _Base::_index(v);
+    
+
+    if (idx != -1 &&_BST::exists(v) && _Vect::operator[](idx) == v ){ // exist in BTS and Vect
+
+      _BST::erase(v); _Vect::operator[](idx) = Ptr2Info{}; // erase from everywhere (BST and Vect)
+      res =  true;
+      }
+    else{
+      std::cout << idx <<_BST::exists(v)<< " - \n"<< true;
+      if (_BST::exists(v) && idx == -1){
+      
       auto the_info = _BST::find(v);
-      std::ptrdiff_t idx = _Base::_index(the_info);
-
+      idx = _Base::_index(the_info);
+      std::cout << idx << std::endl;
       _BST::erase(v); _Vect::operator[](idx) = Ptr2Info{}; // erase from everywhere (BST and Vect)
-      return true;
+      res =  true;
       }
-    std::cout << "\nExiste pas, Value : "<< v << std::endl;
-    return false;
+    }
+
+
+    return res;
 
   }
 
-  bool erase(const Info& v,std::ptrdiff_t idx) {
-    //Info info_wrapper = Info(v);
-
-  
-    if (_Vect::operator[](idx) == v ){ // exist in BTS and Vect
-
-      _BST::erase(v); _Vect::operator[](idx) = Ptr2Info{}; // erase from everywhere (BST and Vect)
-      return true;
-      }
-
-
-    // TODO modifier le cout
-    std::cout << "\nExiste pas, Value and index : "<< v <<" "<< idx<< std::endl;
-    return false;
-
-  }
 
   bool exists  (const Info& v) const noexcept override{
-        auto val = _BST::exists(Info(v));
-        return val;
+        
+        return _BST::exists(Info(v));
   };
 
-  const Info& find(const Info& v) const noexcept override {
 
-    return _BST::find(v);
-  }
+  const Info& find (const Info& v) const noexcept override  {
 
-  const Info& find (const Info& v,std::ptrdiff_t idx) const noexcept  {
+    std::ptrdiff_t idx = _Base::_index(v);
+
+    if (idx == -1){
+      return _BST::find(v);
+    }
 
     const Ptr2Info& vect_ptr2info = _Vect::operator[](idx); // get the Ptr2info in the vect
     const Info* vect_info = _Base::_ptr(vect_ptr2info); // get Info in Ptr2Info
 
-
-    if (vect_info && v==*vect_info){ // not empty and v equal info in the vect
-      return *vect_info;
+    if (vect_info != nullptr && v==*vect_info){ // not empty and v equal info in the vect
+      return v;
     }
+    
 
     return _BST::_NOT_FOUND; // idx doesn't match
 

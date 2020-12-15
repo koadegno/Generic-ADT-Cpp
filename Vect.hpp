@@ -18,6 +18,8 @@ class Vect {
   std::size_t _dim = 0;
   T *_val = nullptr;
   inline static T* _cp (const Vect&);
+protected:
+  std::ptrdiff_t getIndex();
 
 public:
   // constructeurs
@@ -26,9 +28,9 @@ public:
 
   // observateurs
   constexpr std::size_t dim () const noexcept {return _dim;}
-  virtual inline const T& operator[] (std::ptrdiff_t) const;
+  inline const T& operator[] (std::ptrdiff_t) const;
   // modificateurs
-  virtual inline T& operator[] (std::ptrdiff_t);
+  inline T& operator[] (std::ptrdiff_t);
 
   // copies, transferts, etc.
   Vect (const Vect& v) noexcept: _dim(v._dim), _val(_cp(v)) {}
@@ -36,7 +38,7 @@ public:
     {v._dim = 0; v._val = nullptr;}
   virtual inline Vect& operator= (const Vect&) noexcept;
   virtual inline Vect& operator= (Vect&&) noexcept;
-  std::ptrdiff_t getIndex();
+  
   // destructeur
   virtual ~Vect () noexcept {delete[] _val;}
 
@@ -64,6 +66,7 @@ std::ptrdiff_t Vect<T>::getIndex(){
 template <typename T>
 const T& Vect<T>::operator[] (std::ptrdiff_t idx) const {
   if (std::size_t(idx) >= _dim){
+    std::cout << idx << std::endl;
     throw std::domain_error("Vect::op[]: index out of range");};
 
   return _val[idx];
