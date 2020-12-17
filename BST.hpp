@@ -27,7 +27,7 @@ private:
   static _Node* _cp (const _Node* r) noexcept     // idem
     {return r ? new _Node(*r) : nullptr;}
 
-  std::size_t sizeTree(const BST* node) const 
+  std::size_t sizeTree(const BST* node) const  // indique le nombre de noeud
     { if(!node->_root){return 0;}
       else{return 1 + sizeTree(&((node->_root)->left)) + sizeTree(&((node->_root)->right));}
     }
@@ -60,7 +60,7 @@ public:
   friend inline std::ostream& operator<< (std::ostream&, const BST<U>&);
 
   // Implemantation
-  std::size_t node_number() const {return this->sizeTree(this);}
+  virtual std::size_t node_number() const {return this->sizeTree(this);}
 }; // BST<T>
 
 

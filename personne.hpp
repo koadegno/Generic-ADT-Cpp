@@ -16,7 +16,7 @@ class Personne
     friend bool operator<(const Personne& first, const Personne& second);
     
 public:
-    constexpr Personne(char init ='V',int age = 4) noexcept:_initiale(init),_age(age){}
+    constexpr Personne(char init ='V',int age = 0) noexcept:_initiale(init),_age(age){}
     constexpr Personne(char init) noexcept:_initiale(init),_age(1){}
 
     ~Personne(){}
@@ -30,11 +30,11 @@ public:
 //====================== def ================================
 
 bool operator==(const Personne& first, const Personne& second){
-    return first._age == second._age;
+    return first._initiale == second._initiale;
 }
 
 bool operator<(const Personne& first, const Personne& second){
-    return first._age < second._age;
+    return first._initiale < second._initiale;
 }
 
 std::ostream& operator<<(std::ostream& out, const Personne& obj){

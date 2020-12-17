@@ -157,6 +157,7 @@ private:
   using _BST::operator=;
   using _Vect::operator=;
   //using _Vect::operator[];
+  typename _Base::Ptr2Info& operator[] (std::ptrdiff_t idx) override {return _Vect::operator[](idx);}
   
   
   
@@ -202,11 +203,6 @@ public:
     return _Vect::operator[](idx);
   }
   // Getter
-    
-
-  std::size_t node_number () const {
-    return _BST::node_number();}
-
 
   std::size_t dim() const {
     return DIM;}
@@ -221,7 +217,7 @@ public:
     Ptr2Info ptr_wrapper{}; 
     _Base::_ptr(ptr_wrapper) = r; //get ref to Info
     
-    if (node_number() < DIM && std::size_t(idx) < DIM){
+    if (_BST::node_number() < DIM && std::size_t(idx) < DIM){
 
       if (_BST::exists(*r)){ 
         std::ptrdiff_t id = _Base::_index(_BST::find(*r));
@@ -273,7 +269,16 @@ public:
   bool exists  (const Info& v) const noexcept override{
         T tmp = v;
         Info* tmp2 = new Info(tmp);
-        return _BST::exists(*tmp2);
+        ptrdiff_t idx = _Base::_index(v);
+        if (idx == -1){ // not in vect
+          return _BST::exists(*tmp2);
+        }
+        else{
+          if (&(find(v)) == &_BST::_NOT_FOUND){ // not in cont 
+            return false;
+          }
+        }
+        return true;
   };
 
 

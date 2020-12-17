@@ -20,14 +20,6 @@ class Vect {
   inline static T* _cp (const Vect&);
   template <typename U>
   friend std::ostream& operator<< (std::ostream& , const Vect<U>& );
-protected:
-  std::ptrdiff_t getIndex();
-  void _dsp(std::ostream& out) const{
-    out << "Vect : ";
-    out << "[ ";
-    for (std::size_t i = 0; i < _dim; ++i) out << _val[i] << ' ';
-    out << ']';
-  }
 
 public:
   // constructeurs
