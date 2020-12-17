@@ -153,7 +153,12 @@ private:
   std::size_t DIM;
 
   virtual void _dsp (std::ostream& out) const override {_BST::_dsp(out);}
-  using _Vect::operator[];
+  
+  using _BST::operator=;
+  using _Vect::operator=;
+  //using _Vect::operator[];
+  
+  
   
   // ...
 public:
@@ -163,9 +168,11 @@ public:
   using const_reference = const T&;
   using Info = typename _Base::Info;
   using Ptr2Info = typename _Base::Ptr2Info;
-
+  //_Vect::operator[];
+  
   // ...
-
+  
+  
   // constructeur
 
   explicit Cont (std::size_t taille ): _Base(), _Vect(taille),DIM(taille){};
@@ -188,53 +195,14 @@ public:
     return *this;
   }
 
-  Cont& operator= (const _Vect& other)noexcept override{
-    if(this!= &other){
 
-      _Vect::operator=(other);
-      _BST::operator=(dynamic_cast<const _BST&>(other));
-      DIM = (static_cast<const Cont<T>&>(other)).DIM;
-    }
-    return *this;
-  }
-  Cont& operator= (_Vect&& other)noexcept override{
-    if(this!= &other){
-
-      _Vect::operator=(other);
-      _BST::operator=(dynamic_cast<const _BST&>(other));
-      DIM = (static_cast<const Cont<T>&>(other)).DIM;
-    }
-    return *this;
-  }
-  Cont& operator= (const _BST& other) override {
-    if(this!= &other){
-
-      _Vect::operator=(dynamic_cast<const _Vect&>(other));
-      _BST::operator=(other);
-      DIM = (static_cast<const Cont<T>&>(other)).DIM;
-    }
-    return *this;
-  }
-
-  Cont& operator= (_BST&& other) override{
-    if(this!= &other){
-      _Vect::operator=(dynamic_cast<_Vect&>(other));
-      _BST::operator=(other);
-      DIM = (static_cast<Cont<T>&>(other)).DIM;
-      (static_cast<Cont<T>&>(other)).DIM = 0;
-
-    }
-    return *this;
-  }
-
-  // Getter
-  const Info& operator[](std::ptrdiff_t idx) const {
+  const Ptr2Info& operator[](std::ptrdiff_t idx) const override {
 
     //std::cout << val << std::endl;
-    auto out = _Vect::operator[](idx);
-    return out;
-  };
-
+    return _Vect::operator[](idx);
+  }
+  // Getter
+    
 
   std::size_t node_number () const {
     return _BST::node_number();}
@@ -245,22 +213,29 @@ public:
 
   // methode
   const Info& insert (const Info& v) override {
+    
+    T tmp = v;
 
     ptrdiff_t idx = _Base::_index(v);
-    Ptr2Info ptr_wrapper{}; _Base::_ptr(ptr_wrapper) = &v; //get ref to Info
-    bool already_in = _BST::exists(v);
-
+    Info *r =  new Info(tmp);
+    Ptr2Info ptr_wrapper{}; 
+    _Base::_ptr(ptr_wrapper) = r; //get ref to Info
+    
     if (node_number() < DIM && std::size_t(idx) < DIM){
 
-      if (already_in){ 
-        if ( _Base::_ptr(_Vect::operator[](idx)) != nullptr ){ // write on a existing value
-          _BST::erase(_Vect::operator[](idx));
+      if (_BST::exists(*r)){ 
+        std::ptrdiff_t id = _Base::_index(_BST::find(*r));
+        
+        if ( _Base::_ptr(_Vect::operator[](id)) != nullptr ){ // write on a existing value
+          
+          erase(_Vect::operator[](id));
           }
     
       }
-
-      _Vect::operator[](idx) = ptr_wrapper ; 
-      return _BST::insert(v);
+      _Base::_index(*r) = idx;
+      _Vect::operator[](idx) = ptr_wrapper ;
+      //std::cout << _Vect::operator[](idx) << std::endl;
+      return _BST::insert(*r);
     }
     
     return _BST::_NOT_FOUND;
@@ -273,19 +248,17 @@ public:
     bool res = false;
     std::ptrdiff_t idx = _Base::_index(v);
     
-
-    if (idx != -1 &&_BST::exists(v) && _Vect::operator[](idx) == v ){ // exist in BTS and Vect
+    Info* tmp = new Info(v);
+    if (idx != -1 && _Vect::operator[](idx) == *tmp ){ // exist in BTS and Vect
 
       _BST::erase(v); _Vect::operator[](idx) = Ptr2Info{}; // erase from everywhere (BST and Vect)
       res =  true;
       }
     else{
-      std::cout << idx <<_BST::exists(v)<< " - \n"<< true;
-      if (_BST::exists(v) && idx == -1){
+      if (_BST::exists(v)){
       
       auto the_info = _BST::find(v);
       idx = _Base::_index(the_info);
-      std::cout << idx << std::endl;
       _BST::erase(v); _Vect::operator[](idx) = Ptr2Info{}; // erase from everywhere (BST and Vect)
       res =  true;
       }
@@ -298,8 +271,9 @@ public:
 
 
   bool exists  (const Info& v) const noexcept override{
-        
-        return _BST::exists(Info(v));
+        T tmp = v;
+        Info* tmp2 = new Info(tmp);
+        return _BST::exists(*tmp2);
   };
 
 
@@ -314,8 +288,8 @@ public:
     const Ptr2Info& vect_ptr2info = _Vect::operator[](idx); // get the Ptr2info in the vect
     const Info* vect_info = _Base::_ptr(vect_ptr2info); // get Info in Ptr2Info
 
-    if (vect_info != nullptr && v==*vect_info){ // not empty and v equal info in the vect
-      return v;
+    if (vect_info && v==*vect_info){ // not empty and v equal info in the vect
+      return *vect_info;
     }
     
 

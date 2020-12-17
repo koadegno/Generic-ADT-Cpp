@@ -18,26 +18,34 @@ class Vect {
   std::size_t _dim = 0;
   T *_val = nullptr;
   inline static T* _cp (const Vect&);
+  template <typename U>
+  friend std::ostream& operator<< (std::ostream& , const Vect<U>& );
 protected:
   std::ptrdiff_t getIndex();
+  void _dsp(std::ostream& out) const{
+    out << "Vect : ";
+    out << "[ ";
+    for (std::size_t i = 0; i < _dim; ++i) out << _val[i] << ' ';
+    out << ']';
+  }
 
 public:
   // constructeurs
   constexpr Vect () noexcept = default;   // Tableau vide
   explicit Vect (std::size_t d) noexcept: _dim(d), _val(new T[d]) {}
-
+  
   // observateurs
   constexpr std::size_t dim () const noexcept {return _dim;}
-  inline const T& operator[] (std::ptrdiff_t) const;
+  virtual inline const T& operator[] (std::ptrdiff_t) const;
   // modificateurs
-  inline T& operator[] (std::ptrdiff_t);
+  virtual inline T& operator[] (std::ptrdiff_t);
 
   // copies, transferts, etc.
   Vect (const Vect& v) noexcept: _dim(v._dim), _val(_cp(v)) {}
   constexpr Vect (Vect&& v) noexcept: _dim(v._dim), _val(v._val)
     {v._dim = 0; v._val = nullptr;}
-  virtual inline Vect& operator= (const Vect&) noexcept;
-  virtual inline Vect& operator= (Vect&&) noexcept;
+  inline Vect& operator= (const Vect&) noexcept;
+  inline Vect& operator= (Vect&&) noexcept;
   
   // destructeur
   virtual ~Vect () noexcept {delete[] _val;}
@@ -48,18 +56,6 @@ public:
 
 
 // methode ============================================================
-template<typename T>
-std::ptrdiff_t Vect<T>::getIndex(){
-  
-  for(std::ptrdiff_t i = 0; std::size_t(i) < _dim;i++){
-    if((_val[i]).isEmpty()){
-      return i;
-    }
-  }
-
-  return -1;
-} 
-
 
 // observateurs =============================================================
 
@@ -106,6 +102,12 @@ Vect<T>& Vect<T>::operator= (Vect&& v) noexcept {
   return *this;
 }
 
+
+template <typename T>
+inline std::ostream& operator<< (std::ostream& out, const Vect<T>& v){
+    v._dsp(out);
+    return out;
+}
 // fonctions externes =======================================================
 
 

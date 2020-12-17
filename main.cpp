@@ -22,105 +22,96 @@ const V max(const Vect<typename Cont<V>::Ptr2Info>* vecteur){
     return biggest;
 }
 
-template <typename V>
-const V min(const Vect<typename Cont<V>::Ptr2Info>* vect){
-    
-    V min_ = (*vect)[0];
-    for (std::size_t i=1; i < vect->dim(); i++){
-
-        const V& tmp = (*vect)[std::ptrdiff_t(i)];
-        if (tmp < min_){ min_ = tmp;};
-
-    }
-    return min_;
-}
-
-
-template<typename K>
-std::ptrdiff_t index(const Vect<typename Cont<K>::Ptr2Info>* vect, K& to_search){
-    std::ptrdiff_t ret_val = -1;
-    
-    K val{};
-    for(std::size_t i =0; i< vect->dim(); i++){
-        val = (*vect)[std::ptrdiff_t(i)];
-        if( val == to_search){ret_val = std::ptrdiff_t(i);break;}
-
-        };
-    
-    return ret_val;
-}
-
 
 template<typename K>
 void print_vect(const Vect<typename Cont<K>::Ptr2Info>* obj_vect){
     std::cout<< "Vecteur de taille : "<<obj_vect->dim()<<std::endl << "[ ";
-
-    for(std::size_t i=0; i < obj_vect->dim(); i++)
-        std::cout << (*obj_vect)[i]<< " " ;
-
+    const typename Cont<K>::Ptr2Info& EMPTY{};
+    for(std::ptrdiff_t i=0; std::size_t(i) < obj_vect->dim(); i++){
+        if ((*obj_vect)[i] = EMPTY){
+            std::cout << (*obj_vect)[i]<< " " ;
+        }
+    }
     std::cout << "]"<<std::endl;
 }
 
 template<typename K>
 void init_pers(BST<typename Cont<K>::Info>* obj_bst, std::size_t taille){
-
+    char lettre[] = {'k','f','d','a','c','u','o','w','m'};
     srand(7892458);
     for (std::ptrdiff_t i = 0; std::size_t(i)< taille; i++){
         
-        obj_bst->insert({i,Personne('J',rand()%70)});
+        obj_bst->insert({i,Personne(lettre[rand()%9],rand()%70)});
     }
+    std::cout << *obj_bst << std::endl;
 }
 
 template<typename K>
-void del(BST<typename Cont<K>::Info>* obj_bst,const K& to_del){
-    obj_bst->erase(to_del);
+void init_char(BST<typename Cont<K>::Info>*bst,std::size_t taille){
+
+    char lettre[] = {'k','f','d','a','c','u','o','w','m'};
+    srand(7892458);
+    for (std::ptrdiff_t i = 0; std::size_t(i)< taille; i++){
+        MyChar tmp = MyChar(lettre[rand()%9]);
+        //std::cout << tmp << " ";
+        bst->insert({i,tmp});
+    }
+    //printf("\n");
+    std::cout << *bst << std::endl;
 }
+
+template<typename K>
+void test1_bst(BST<typename Cont<K>::Info>* bst){
+
+    char lettre[] = {'k','f','d','a','c','u','o','w','m'};
+    std::size_t j = bst->node_number()-7;
+    
+    for(std::ptrdiff_t i=0; std::size_t(i)<j; i++){
+        K to_search{lettre[rand()%9]};
+        std::cout << "to erase : " << to_search <<std::endl;
+        if (bst->exists({to_search})){
+            
+            bst->erase({to_search});
+        }
+    }
+    std::cout << *bst << std::endl;
+    
+}
+
+template<typename T>
+void test2_bst(const BST<typename Cont<T>::Info>* bst){
+
+    char lettre[] = {'k','f','d','a','c','u','o','w','m'};
+    
+    if(!(bst->isEmpty())){
+        
+        for(std::ptrdiff_t i=0; std::size_t(i)<bst->node_number(); i++){
+            
+            T to_search{lettre[rand()%9]};
+            if (bst->exists({to_search})){
+                std::cout <<"Dans le bst : "<< bst->find(to_search) << std::endl;
+            }
+            else{
+                std::cout <<"Pas dans le bst : " << to_search << std::endl;
+            }
+            
+        }
+    }
+}
+
 
 void Test1(){
 
-    char mot[] = "dvpgnAoeZybwux";
+    
     std::size_t motSize = 14;
     Cont<MyChar> mycharCont(motSize);
-    BST<typename Cont<MyChar>::Info>* wordTree =nullptr;
-    wordTree = &mycharCont;
+    init_char<MyChar>(&mycharCont,mycharCont.dim());
 
-    for (std::size_t i= 0; i< motSize; i++){
-        wordTree->insert({std::ptrdiff_t(i),MyChar(mot[i])});
-        
-    };
+    test1_bst<MyChar>(&mycharCont);
+    std::cout << mycharCont << std::endl;
+    test2_bst<MyChar>(&mycharCont);
 
-    std::cout <<"Le conteneur : "<< mycharCont<< std::endl;
-    
-    auto tmp = min<MyChar>(&mycharCont);
-    std::cout << "min value delete : "<<tmp<<std::endl;
-    std::ptrdiff_t idx = index<MyChar>(&mycharCont,tmp);
-    mycharCont.erase({idx,tmp});
-    std::cout <<"Le conteneur : "<< *wordTree<< std::endl;
-    mycharCont.insert({5,tmp});
-    std::cout <<"Le conteneur : "<< *wordTree<< std::endl;
-
-    tmp = max<MyChar>(&mycharCont);
-    std::cout << "max value delete : " << tmp << std::endl;
-    mycharCont.erase({index<MyChar>(&mycharCont,tmp),max<MyChar>(&mycharCont)});
-    std::cout <<"Le conteneur : "<< *wordTree<< std::endl;
-    tmp = max<MyChar>(&mycharCont);
-    std::cout << "max value delete : " << tmp << std::endl;
-    wordTree->erase({tmp});
-
-    std::cout <<"Le conteneur : "<< *wordTree<< std::endl;
-    for (MyChar elem: mot){
-        if (mycharCont.exists({elem})){
-            wordTree->erase({elem});
-        }
-    }
-    std::cout <<"Le conteneur : "<< mycharCont<< std::endl;
-
-    for (std::ptrdiff_t i= 0; std::size_t(i)< motSize; i++){
-        mycharCont.insert({i,MyChar(mot[i])});
-        
-    };
-
-    std::cout <<"Le conteneur : "<< mycharCont<< std::endl;
+    print_vect<MyChar>(&mycharCont);
     std::cout << std::endl;
 
 }
@@ -132,18 +123,17 @@ void Test2(){
     
     
     Cont<Personne> persCont{10};
-    init_pers<Personne>(&persCont,persCont.dim());
-
-    std::cout << persCont << std::endl;
+    const Vect<typename Cont<Personne>::Ptr2Info> * objvect = &persCont;
 
     std::cout << persCont[0] << std::endl;
-    //print_vect<Personne>(&persCont);
-    /*for(std::ptrdiff_t i = 0; i < 2; i++){
-        
-        const Personne to_sup = min<Personne>(&persCont);
-        std::cout << to_sup << std::endl;
-        del<Personne>(&persCont,to_sup);
-    }*/
+    
+    
+    init_pers<Personne>(&persCont,persCont.dim());
+    
+    std::cout << persCont << std::endl;
+    print_vect<Personne>(&persCont);
+    
+    
 
     std::cout << persCont << std::endl;
 
@@ -154,10 +144,10 @@ void Test2(){
 
 int main(){
 
-    //Test1();
+    Test1();
 
-    Test2();
-
+    //Test2();
+    
 
     return 0;
 }

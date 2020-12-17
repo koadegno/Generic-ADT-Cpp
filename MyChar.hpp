@@ -1,8 +1,3 @@
-/* GNU C++ version 10.2 - "g++ -std=c++17"
- * Yves Roggeman - 2020/09 - <MyChar.hpp>
- * Exercice de conversions
- * Classe de caractères étranges
- */
 #ifndef _MYCHAR_H_
 #define _MYCHAR_H_
 
